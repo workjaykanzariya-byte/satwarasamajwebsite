@@ -8,44 +8,101 @@ on:
 
 jobs:
   deploy:
-    name: Sync & Deploy to Production VPS
+    name: Build & Deploy to Production VPS
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        run: npm --prefix frontend ci
+
+      - name: Build Frontend Application
+        run: npm --prefix frontend run build
+
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
 
-      - name: Add Host to Known Hosts
+      - name: Add VPS to Known Hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -p ${{ secrets.PROD_SSH_PORT || 22 }} -H "${{ secrets.PROD_SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Sync Repository Files (with Deletion Synchronization)
+      - name: Deploy Frontend dist to public_html (rsync --delete)
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
+            --exclude='.htaccess' \
+            ./frontend/dist/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:/home/satwaramahamandal.org/public_html/
+
+      - name: Deploy Backend Source to VPS (rsync --delete with exclusions)
         run: |
           rsync -avz --delete \
             -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
             --exclude='.env' \
             --exclude='.env.*' \
-            --exclude='.git' \
-            --exclude='.github' \
             --exclude='node_modules' \
-            --exclude='backend/node_modules' \
-            --exclude='frontend/node_modules' \
-            --exclude='frontend/dist' \
-            --exclude='backend/uploads' \
-            ./ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/"
+            --exclude='uploads' \
+            --exclude='logs' \
+            ./backend/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/backend/"
 
-      - name: Execute Server Deployment & Health Check
+      - name: Sync Root Scripts & Configs
         run: |
-          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} "bash '${{ secrets.PROD_DEPLOY_PATH }}/scripts/deploy-production.sh'"
+          rsync -avz \
+            -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
+            ./scripts/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/scripts/"
 
-      - name: Public Health Check
+      - name: Execute Backend Dependencies, Prisma Generate & PM2 Restart
         run: |
-          curl -k -fsS -I https://satwaramahamandal.org/
-          curl -k -fsS https://satwaramahamandal.org/api/v1/health
-          echo "✅ Production Deployment & Public Health Check Succeeded!"
+          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} << 'EOF'
+            set -e
+            cd "/var/www/satwaramahamandal/Satvara Samaj Website/backend"
+            
+            echo "📦 Installing Production Backend Dependencies..."
+            npm ci --omit=dev
+            
+            echo "⚙️ Generating Prisma Client..."
+            npx prisma generate
+            
+            echo "🔄 Restarting PM2 Application (satwara-backend)..."
+            pm2 restart satwara-backend --update-env
+            pm2 save
+          EOF
+
+      - name: Post-Deployment Server Health Checks
+        run: |
+          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} << 'EOF'
+            set -e
+            echo "🔍 Running Post-Deployment Health Verification..."
+            
+            echo "1. PM2 Application Status:"
+            pm2 status satwara-backend
+            
+            echo "2. Backend Port 5000 Listener Check:"
+            ss -ltnp | grep :5000 || (echo "❌ Backend port 5000 not listening!" && exit 1)
+            
+            echo "3. Local Frontend Host Verification:"
+            curl -I -s http://127.0.0.1/ -H "Host: satwaramahamandal.org" | head -n 5
+            
+            echo "4. Local Backend Health API Verification:"
+            curl -i -s http://127.0.0.1:5000/api/v1/health | head -n 10
+            
+            echo "5. Public Production HTTPS Domain Check:"
+            curl -4 -k -I -s https://satwaramahamandal.org/ | head -n 5
+            
+            echo "6. Public Production API Endpoint Check:"
+            curl -k -fsS https://satwaramahamandal.org/api/v1/health
+            
+            echo ""
+            echo "✅ All Production Health Checks Passed Successfully!"
+          EOF
