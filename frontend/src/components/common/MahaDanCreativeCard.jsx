@@ -15,7 +15,26 @@ const getImageUrl = (path) => {
 
 export default function MahaDanCreativeCard({ donation, showActions = true }) {
   const cardRef = useRef(null);
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(1);
   const [adminQrImage, setAdminQrImage] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        if (containerWidth > 0 && containerWidth < 660) {
+          setScale(containerWidth / 660);
+        } else {
+          setScale(1);
+        }
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     api.get('/cms/settings')
@@ -141,25 +160,33 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
         EXACT REFERENCE CREATIVE POSTER CANVAS (660px x 660px)
         ============================================================
       */}
-      <div className="creative-card-scale-wrapper" style={{ width: '100%', overflowX: 'auto', display: 'flex', justifyContent: 'center', padding: '10px 0' }}>
+      <div ref={containerRef} style={{ width: '100%', maxWidth: '660px', margin: '0 auto' }}>
         <div
-          ref={cardRef}
-          id="maha-dan-exact-card"
           style={{
             width: '660px',
             height: '660px',
-            margin: '0 auto',
-            background: '#FAF8F5',
-            position: 'relative',
-            overflow: 'hidden',
-            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            boxSizing: 'border-box',
-            padding: '24px 28px',
-            color: '#0F172A',
-            boxShadow: '0 20px 50px rgba(15, 23, 42, 0.25)',
-            flexShrink: 0,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            marginBottom: scale < 1 ? `${(scale - 1) * 660}px` : '0px',
           }}
         >
+          <div
+            ref={cardRef}
+            id="maha-dan-exact-card"
+            style={{
+              width: '660px',
+              height: '660px',
+              margin: '0 auto',
+              background: '#FAF8F5',
+              position: 'relative',
+              overflow: 'hidden',
+              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              boxSizing: 'border-box',
+              padding: '24px 28px',
+              color: '#0F172A',
+              boxShadow: '0 20px 50px rgba(15, 23, 42, 0.25)',
+            }}
+          >
         {/* ================= WATERMARK BANNER FOR VERIFICATION PENDING ================= */}
         {isPending && (
           <div
@@ -250,7 +277,7 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
           </div>
 
           {/* Middle Section Grid: Hero Donor Photo + 35 Years Emblem + Details */}
-          <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '24px', alignItems: 'center', margin: '8px 0' }}>
+          <div className="exact-card-grid-middle" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '24px', alignItems: 'center', margin: '8px 0' }}>
             
             {/* Left Column: Hero Circular Donor Photo with Gold/Navy concentric rings + Ribbon */}
             <div style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto' }}>
@@ -371,6 +398,7 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
 
           {/* Bottom Section: Solid Dark Navy Ribbon Footer */}
           <div
+            className="exact-card-grid-bottom"
             style={{
               background: '#0F172A',
               borderRadius: '4px',
@@ -426,7 +454,8 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
         </div>
       </div>
     </div>
+  </div>
 
-    </div>
+</div>
   );
 }

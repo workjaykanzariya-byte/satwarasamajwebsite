@@ -684,20 +684,6 @@ export default function MahaDanPage() {
                 )}
               </div>
 
-              {/* UTR / TRANSACTION ID */}
-              <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--primary-navy)' }}>
-                  Transaction UTR / Reference Number (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 423987123984 or UPI Ref No"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  className="form-control"
-                />
-              </div>
-
               {errorMsg && (
                 <div style={{ marginBottom: '16px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B', padding: '10px', borderRadius: '6px', fontSize: '0.85rem' }}>
                   ⚠️ {errorMsg}

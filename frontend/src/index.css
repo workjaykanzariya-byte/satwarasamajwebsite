@@ -945,3 +945,19 @@ img, video, iframe {
     padding: 3px 8px !important;
   }
 }
+
+/* Isolation rules for MahaDan exact poster card to ensure 100% precision on mobile screens */
+#maha-dan-exact-card,
+#maha-dan-exact-card * {
+  box-sizing: border-box !important;
+}
+
+#maha-dan-exact-card .exact-card-grid-middle {
+  display: grid !important;
+  grid-template-columns: 220px 1fr !important;
+}
+
+#maha-dan-exact-card .exact-card-grid-bottom {
+  display: grid !important;
+  grid-template-columns: 1.1fr 1.2fr 1fr !important;
+}
