@@ -524,7 +524,7 @@ export default function MahaDanPage() {
                 Track Maha Dan Verification Status & Certificate
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
-                Enter your **Maha Dan Reference ID** (e.g. <code>MD-2026-8819</code>) or your registered **Mobile Number**.
+                Enter your <strong>Maha Dan Reference ID</strong> (e.g. <code>MD-2026-8819</code>) or your registered <strong>Mobile Number</strong>.
               </p>
 
               <form onSubmit={handleTrackDonation} style={{ display: 'flex', gap: '12px', maxWidth: '540px', margin: '0 auto' }}>

@@ -793,7 +793,7 @@ img, video, iframe {
   }
 
   /* Admin Pages inside main fill full width */
-  main .container {
+  .admin-page main .container {
     width: 100% !important;
     max-width: 100% !important;
     padding: 0 !important;
@@ -835,6 +835,7 @@ img, video, iframe {
     width: 100% !important;
     justify-content: center !important;
   }
+}
 
 /* MahaDan Public Page Responsive Layout Rules */
 .public-mahadan-tabs {
@@ -855,15 +856,15 @@ img, video, iframe {
 
 .public-mahadan-grid {
   display: grid !important;
-  grid-template-columns: 1fr 1.2fr !important;
-  gap: 32px !important;
+  grid-template-columns: 1fr 1.1fr !important;
+  gap: 24px !important;
   align-items: start !important;
 }
 
 .public-mahadan-amount-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  gap: 12px !important;
+  gap: 10px !important;
 }
 
 .public-mahadan-amount-grid button {
@@ -877,8 +878,8 @@ img, video, iframe {
   margin-bottom: 16px !important;
 }
 
-/* Mobile Stacking for MahaDan Form (<= 768px) */
-@media (max-width: 768px) {
+/* Mobile Stacking for MahaDan Form ONLY on Small Smartphones (<= 600px) */
+@media (max-width: 600px) {
   .public-mahadan-tabs {
     flex-direction: column !important;
   }
@@ -887,7 +888,7 @@ img, video, iframe {
   }
   .public-mahadan-grid {
     grid-template-columns: 1fr !important;
-    gap: 20px !important;
+    gap: 18px !important;
   }
   .public-mahadan-amount-grid {
     grid-template-columns: repeat(3, 1fr) !important;
@@ -895,7 +896,7 @@ img, video, iframe {
   }
   .public-mahadan-input-grid {
     grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    gap: 10px !important;
   }
 }
 
@@ -937,7 +938,6 @@ img, video, iframe {
   .beds-row {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
   }
-}
 
 /* Extra Small Phones (<= 480px) */
 @media (max-width: 480px) {
