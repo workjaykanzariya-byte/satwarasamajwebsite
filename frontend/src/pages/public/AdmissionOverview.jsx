@@ -57,7 +57,7 @@ export default function AdmissionOverview() {
         <h1 className="heading-serif" style={{ fontSize: '2.4rem', color: 'var(--primary-maroon)', marginBottom: '12px' }}>
           Hostel Admission Portal 2026-2027
         </h1>
-        <p style={{ color: 'var(--text-muted)' }}>Transparent merit-based admissions for Shree Satwara Maha Mandal Hostels in Ahmedabad & Anand (V.V. Nagar).</p>
+        <p style={{ color: 'var(--text-muted)' }}>Transparent merit-based admissions for Samast Satwara Mahamandal Hostels in Ahmedabad & Anand (V.V. Nagar).</p>
       </div>
 
       {isAllClosed && (

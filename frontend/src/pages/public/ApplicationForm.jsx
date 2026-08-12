@@ -608,7 +608,7 @@ export default function ApplicationForm() {
                 <ShieldAlert size={18} /> Severe Warning Regarding False Academic Marks
               </div>
               <p style={{ fontSize: '0.82rem', color: '#991b1b' }}>
-                Providing inaccurate or forged academic marks will result in permanent rejection, fee forfeiture, and blacklisting from Shree Satwara Maha Mandal hostels.
+                Providing inaccurate or forged academic marks will result in permanent rejection, fee forfeiture, and blacklisting from Samast Satwara Mahamandal hostels.
               </p>
             </div>
 

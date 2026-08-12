@@ -70,7 +70,7 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
 
   const shareWhatsApp = () => {
     const statusTxt = isPending ? '⏳ *Verification Pending (Official Card will be sent on WhatsApp after verification)*' : '✅ *Official Trust Verified*';
-    const text = `🙏 *Shree Satwara Maha Mandal - Ahmedabad* 🙏\n\nI, *${donation.donorName}*, have contributed a Maha Dan of *₹${donation.amount.toLocaleString()}* for Satwara Samaj Student Welfare.\n\nStatus: ${statusTxt}\nRef ID: *${donation.certificateNo}*\n\nWebsite: www.satwaramahamandal.org`;
+    const text = `🙏 *Samast Satwara Mahamandal - Ahmedabad* 🙏\n\nI, *${donation.donorName}*, have contributed a Maha Dan of *₹${donation.amount.toLocaleString()}* for Satwara Samaj Student Welfare.\n\nStatus: ${statusTxt}\nRef ID: *${donation.certificateNo}*\n\nWebsite: www.satwaramahamandal.org`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 

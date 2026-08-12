@@ -18,7 +18,7 @@ export default function PublicMeritList() {
         <h1 className="heading-serif" style={{ fontSize: '2.4rem', color: 'var(--primary-maroon)', marginBottom: '12px' }}>
           Published Merit Lists 2026-2027
         </h1>
-        <p style={{ color: 'var(--text-muted)' }}>Official merit list rankings released by Shree Satwara Maha Mandal Admission Desk.</p>
+        <p style={{ color: 'var(--text-muted)' }}>Official merit list rankings released by Samast Satwara Mahamandal Admission Desk.</p>
       </div>
 
       <div className="form-group" style={{ maxWidth: '400px', margin: '0 auto 30px auto' }}>

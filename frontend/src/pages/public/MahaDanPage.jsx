@@ -241,7 +241,7 @@ export default function MahaDanPage() {
   // Share on WhatsApp
   const shareWhatsApp = () => {
     if (!trackedDonation) return;
-    const text = `🙏 *Shree Satwara Maha Mandal - Ahmedabad* 🙏\n\nI, *${trackedDonation.donorName}*, have contributed a Maha Dan of *₹${trackedDonation.amount.toLocaleString()}* for Satwara Samaj Student Welfare.\n\nCertificate No: *${trackedDonation.certificateNo}*`;
+    const text = `🙏 *Samast Satwara Mahamandal - Ahmedabad* 🙏\n\nI, *${trackedDonation.donorName}*, have contributed a Maha Dan of *₹${trackedDonation.amount.toLocaleString()}* for Satwara Samaj Student Welfare.\n\nCertificate No: *${trackedDonation.certificateNo}*`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -273,7 +273,7 @@ export default function MahaDanPage() {
       <section style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)', color: '#ffffff', padding: '56px 0', borderBottom: '4px solid #F59E0B', position: 'relative' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245, 158, 11, 0.25)', color: '#FFD700', border: '1px solid #F59E0B', borderRadius: '30px', padding: '6px 20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '14px' }}>
-            <Sparkles size={16} color="#FFD700" /> Shree Satwara Maha Mandal Initiative
+            <Sparkles size={16} color="#FFD700" /> Samast Satwara Mahamandal Initiative
           </div>
           <h1 style={{ fontSize: '2.5rem', color: '#FFFFFF', margin: '0 0 10px 0', fontWeight: 800, fontFamily: 'serif, sans-serif' }}>
             MAHA DAN PORTAL & HONOR CERTIFICATES
@@ -366,7 +366,7 @@ export default function MahaDanPage() {
                       <Heart fill="var(--primary-maroon)" color="var(--primary-maroon)" size={22} /> Why Contribute Maha Dan?
                     </h3>
                     <p style={{ color: '#475569', lineHeight: '1.7', fontSize: '0.93rem' }}>
-                      Shree Satwara Maha Mandal operates modern hostels and educational welfare programs for Satwara community boys and girls studying in Ahmedabad and Anand.
+                      Samast Satwara Mahamandal operates modern hostels and educational welfare programs for Satwara community boys and girls studying in Ahmedabad and Anand.
                     </p>
 
                     <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>

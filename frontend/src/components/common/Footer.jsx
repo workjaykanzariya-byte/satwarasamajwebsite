@@ -105,7 +105,7 @@ export default function Footer() {
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Shree Satwara Maha Mandal, Ahmedabad. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} Samast Satwara Mahamandal, Ahmedabad. All Rights Reserved.</p>
           <p style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '4px' }}>
             Built with dynamic Bed Occupancy Engine & Merit Admission Management System.
           </p>

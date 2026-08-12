@@ -495,8 +495,8 @@ async function main() {
 
   // 9. Create Default Settings (Admission, Leadership Desk, Contact Info)
   const defaultSettings = [
-    { key: 'org_name_gu', value: 'શ્રી સતવારા મહામંડળ, અમદાવાદ' },
-    { key: 'org_name_en', value: 'Shree Satwara Maha Mandal, Ahmedabad' },
+    { key: 'org_name_gu', value: 'સમસ્ત સતવારા મહામંડળ, અમદાવાદ' },
+    { key: 'org_name_en', value: 'Samast Satwara Mahamandal, Ahmedabad' },
     { key: 'trust_reg_no', value: 'A/1234/AHMEDABAD' },
     { key: 'contact_phone', value: '+91 7043704446' },
     { key: 'contact_email', value: 'info@satvaramahamandal.org' },
