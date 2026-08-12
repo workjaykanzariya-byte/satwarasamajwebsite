@@ -836,60 +836,66 @@ img, video, iframe {
     justify-content: center !important;
   }
 
-/* MahaDan Page Specific Responsive Helper Classes */
-.mahadan-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
+/* MahaDan Public Page Responsive Layout Rules */
+.public-mahadan-tabs {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin-bottom: 32px !important;
+  flex-wrap: wrap !important;
 }
 
-.mahadan-tabs button {
-  width: auto;
-  min-width: unset;
+.public-mahadan-tabs button {
+  width: auto !important;
+  display: inline-flex !important;
+  justify-content: center !important;
 }
 
-.mahadan-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 32px;
-  align-items: start;
+.public-mahadan-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr !important;
+  gap: 32px !important;
+  align-items: start !important;
 }
 
-.mahadan-amount-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+.public-mahadan-amount-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 12px !important;
 }
 
-.mahadan-input-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 16px;
+.public-mahadan-amount-grid button {
+  width: 100% !important;
 }
 
-/* Stacking only applied on small mobile viewports (<= 640px) */
-@media (max-width: 640px) {
-  .mahadan-form-grid {
+.public-mahadan-input-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Mobile Stacking for MahaDan Form (<= 768px) */
+@media (max-width: 768px) {
+  .public-mahadan-tabs {
+    flex-direction: column !important;
+  }
+  .public-mahadan-tabs button {
+    width: 100% !important;
+  }
+  .public-mahadan-grid {
     grid-template-columns: 1fr !important;
     gap: 20px !important;
   }
-}
-
-@media (max-width: 480px) {
-  .mahadan-amount-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+  .public-mahadan-amount-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 8px !important;
   }
-  .mahadan-input-grid {
+  .public-mahadan-input-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
-  }
-  .mahadan-tabs button {
-    width: 100% !important;
-    justify-content: center !important;
   }
 }
 

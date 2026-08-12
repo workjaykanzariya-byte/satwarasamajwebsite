@@ -287,11 +287,11 @@ export default function MahaDanPage() {
       <div className="container" style={{ marginTop: '36px' }}>
 
         {/* Navigation Tabs (Contribute Online vs Track Status) */}
-        <div className="mahadan-tabs">
+        <div className="public-mahadan-tabs">
           <button
             className={`btn ${activeTab === 'donate' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('donate')}
-            style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
             <Heart fill={activeTab === 'donate' ? '#FFD700' : 'none'} size={18} /> Contribute Online (UPI QR)
           </button>
@@ -299,7 +299,7 @@ export default function MahaDanPage() {
           <button
             className={`btn ${activeTab === 'track' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('track')}
-            style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
             <Search size={18} /> Track Status & Download Certificate
           </button>
@@ -358,7 +358,7 @@ export default function MahaDanPage() {
               </div>
             ) : (
               /* FORM GRID */
-              <div className="mahadan-form-grid">
+              <div className="public-mahadan-grid">
                 {/* Left Column: Impact Story */}
                 <div>
                   <div className="card" style={{ padding: '28px', marginBottom: '20px' }}>
@@ -410,7 +410,7 @@ export default function MahaDanPage() {
                       <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#1E293B', marginBottom: '10px' }}>
                         Select Donation Amount (₹)
                       </label>
-                      <div className="mahadan-amount-grid">
+                      <div className="public-mahadan-amount-grid">
                         {predefinedAmounts.map((amt) => {
                           const isSelected = formData.amount === amt.toString();
                           return (
@@ -451,7 +451,7 @@ export default function MahaDanPage() {
                       />
                     </div>
 
-                    <div className="mahadan-input-grid">
+                    <div className="public-mahadan-input-grid">
                       <div className="form-group">
                         <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>Mobile Number</label>
                         <input
