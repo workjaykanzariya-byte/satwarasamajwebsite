@@ -20,7 +20,7 @@ export default function AdminLogin() {
       await loginAdmin(email, password);
       navigate('/admin/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed. Please check credentials.');
+      setError(err.response?.data?.message || err.message || 'Login failed. Please check credentials.');
     } finally {
       setLoading(false);
     }

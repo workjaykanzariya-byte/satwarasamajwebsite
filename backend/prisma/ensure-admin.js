@@ -1,9 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
+const { execSync } = require('child_process');
 const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log('📦 Ensuring database tables exist via Prisma...');
+  try {
+    execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+  } catch (err) {
+    console.warn('⚠️ Warning: Prisma db push step note:', err.message);
+  }
+
   console.log('🔍 Verifying default admin user in database...');
   const passwordHash = await bcrypt.hash('Admin@123', 10);
   const admin = await prisma.admin.upsert({
