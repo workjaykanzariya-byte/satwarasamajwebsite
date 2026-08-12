@@ -5,11 +5,15 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('📦 Ensuring database tables exist via Prisma...');
+  console.log('📦 Creating/synchronizing Prisma database tables...');
   try {
-    execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+    execSync('npx prisma db push --accept-data-loss', {
+      stdio: 'inherit',
+      env: process.env,
+    });
+    console.log('✅ Prisma database schema synchronized successfully!');
   } catch (err) {
-    console.warn('⚠️ Warning: Prisma db push step note:', err.message);
+    console.error('⚠️ Warning during db push:', err.message);
   }
 
   console.log('🔍 Verifying default admin user in database...');

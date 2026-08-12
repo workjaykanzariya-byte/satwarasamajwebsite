@@ -81,7 +81,7 @@ jobs:
             npx prisma generate
 
             echo "👤 Verifying/Seeding Admin User..."
-            node prisma/ensure-admin.js || true
+            node prisma/ensure-admin.js
             
             echo "🔄 Restarting PM2 Application (satwara-backend)..."
             pm2 restart satwara-backend --update-env
