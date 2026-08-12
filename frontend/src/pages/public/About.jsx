@@ -42,7 +42,7 @@ export default function About() {
             <ShieldCheck size={16} /> {t('trust_reg')}
           </div>
           <h1 style={{ fontSize: '2.5rem', color: '#FFFFFF', margin: '0 0 10px 0', fontWeight: 800, fontFamily: 'serif, sans-serif' }}>
-            {language === 'gu' ? 'અમારો પરિચય' : 'About Samast Satvara Mahamandal'}
+            {language === 'gu' ? 'અમારો પરિચય' : 'About Samast Satwara Mahamandal'}
           </h1>
           <p style={{ maxWidth: '780px', margin: '0 auto', color: '#E2E8F0', fontSize: '1.05rem', lineHeight: '1.6' }}>
             સમસ્ત સતવારા મહામંડળ સતવારા સમાજના શૈક્ષણિક, સામાજિક અને સાંસ્કૃતિક વિકાસ માટે કાર્યરત એક અગ્રણી સંસ્થા છે. સંસ્થા દ્વારા શિક્ષણ, સમાજ સેવા, યુવા વિકાસ, સાંસ્કૃતિક પ્રવૃત્તિઓ અને વિદ્યાર્થીઓના કલ્યાણ માટે વિવિધ યોજનાઓ ચલાવવામાં આવે છે.

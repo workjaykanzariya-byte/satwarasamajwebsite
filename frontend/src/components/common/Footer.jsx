@@ -32,7 +32,7 @@ export default function Footer() {
               {t('org_name')}
             </h3>
             <p style={{ fontSize: '0.88rem', color: '#cbd5e1', marginBottom: '16px', lineHeight: '1.5' }}>
-              Dedicated community trust serving Satvara students with modern hostel facilities, merit scholarships, and academic support.
+              Dedicated community trust serving Satwara students with modern hostel facilities, merit scholarships, and academic support.
             </p>
             <p style={{ fontSize: '0.88rem', color: 'var(--accent-gold)', fontWeight: 'bold', background: 'rgba(245, 158, 11, 0.12)', padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.3)', display: 'inline-block', marginBottom: '14px' }}>
               {t('trust_reg')}

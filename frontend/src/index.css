@@ -967,3 +967,17 @@ img, video, iframe {
   display: grid !important;
   grid-template-columns: 1.1fr 1.2fr 1fr !important;
 }
+
+/* Contact Page Central Office Card Layout */
+.contact-office-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 20px !important;
+}
+
+@media (max-width: 600px) {
+  .contact-office-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}

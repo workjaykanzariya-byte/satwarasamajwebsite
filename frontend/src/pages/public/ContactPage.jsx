@@ -69,26 +69,40 @@ export default function ContactPage() {
 
       {/* Central Office Card */}
       <div className="card" style={{ marginBottom: '36px', borderTop: '5px solid var(--accent-gold)', background: '#FFFFFF', padding: '28px' }}>
-        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-navy)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          🏢 Samast Satvara Maha Mandal Central Registered Office
+        <h2 style={{ fontSize: '1.4rem', color: 'var(--primary-navy)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          🏢 Samast Satwara Maha Mandal Central Registered Office
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', fontSize: '0.92rem' }}>
-          <div>
-            <MapPin size={18} style={{ color: 'var(--accent-gold)', display: 'inline', marginRight: '6px' }} />
-            <strong>Address:</strong> {settings.office_address}
+        <div className="contact-office-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '0.92rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <MapPin size={20} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <strong>Address:</strong><br />
+                <span style={{ color: '#475569', lineHeight: '1.5', display: 'block', marginTop: '2px' }}>{settings.office_address}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Phone size={18} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+              <div>
+                <strong>Phone:</strong> <span style={{ color: '#475569' }}>{settings.contact_phone}</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <Phone size={18} style={{ color: 'var(--accent-gold)', display: 'inline', marginRight: '6px' }} />
-            <strong>Phone:</strong> {settings.contact_phone}
-          </div>
-          <div>
-            <Mail size={18} style={{ color: 'var(--accent-gold)', display: 'inline', marginRight: '6px' }} />
-            <strong>Email:</strong> {settings.contact_email}
-          </div>
-          <div>
-            <Clock size={18} style={{ color: 'var(--accent-gold)', display: 'inline', marginRight: '6px' }} />
-            <strong>Office Hours:</strong> {settings.office_hours}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Mail size={18} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+              <div>
+                <strong>Email:</strong> <span style={{ color: '#475569' }}>{settings.contact_email}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Clock size={18} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+              <div>
+                <strong>Office Hours:</strong> <span style={{ color: '#475569' }}>{settings.office_hours}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
