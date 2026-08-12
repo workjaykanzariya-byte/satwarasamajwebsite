@@ -42,14 +42,14 @@ jobs:
       - name: Add VPS to Known Hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p ${{ secrets.PROD_SSH_PORT || 22 }} -H "${{ secrets.PROD_SSH_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.PROD_SSH_PORT || 22 }} -H "${{ secrets.PROD_SSH_HOST || '200.234.34.55' }}" >> ~/.ssh/known_hosts
 
       - name: Deploy Frontend dist to public_html (rsync --delete)
         run: |
           rsync -avz --delete \
             -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
             --exclude='.htaccess' \
-            ./frontend/dist/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:/home/satwaramahamandal.org/public_html/
+            ./frontend/dist/ ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }}:/home/satwaramahamandal.org/public_html/
 
       - name: Deploy Backend Source to VPS (rsync --delete with exclusions)
         run: |
@@ -60,17 +60,17 @@ jobs:
             --exclude='node_modules' \
             --exclude='uploads' \
             --exclude='logs' \
-            ./backend/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/backend/"
+            ./backend/ ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }}:"${{ secrets.PROD_DEPLOY_PATH || '/var/www/satwaramahamandal/Satvara Samaj Website' }}/backend/"
 
       - name: Sync Root Scripts & Configs
         run: |
           rsync -avz \
             -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
-            ./scripts/ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/scripts/"
+            ./scripts/ ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }}:"${{ secrets.PROD_DEPLOY_PATH || '/var/www/satwaramahamandal/Satvara Samaj Website' }}/scripts/"
 
       - name: Execute Backend Dependencies, Prisma Generate & PM2 Restart
         run: |
-          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }} << 'EOF'
             set -e
             cd "/var/www/satwaramahamandal/Satvara Samaj Website/backend"
             
@@ -87,7 +87,7 @@ jobs:
 
       - name: Post-Deployment Server Health Checks
         run: |
-          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }} << 'EOF'
             set -e
             echo "🔍 Running Post-Deployment Health Verification..."
             
