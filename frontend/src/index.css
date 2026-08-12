@@ -845,6 +845,11 @@ img, video, iframe {
   flex-wrap: wrap;
 }
 
+.mahadan-tabs button {
+  width: auto;
+  min-width: unset;
+}
+
 .mahadan-form-grid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
@@ -865,14 +870,15 @@ img, video, iframe {
   margin-bottom: 16px;
 }
 
-@media (max-width: 992px) {
+/* Stacking only applied on small mobile viewports (<= 640px) */
+@media (max-width: 640px) {
   .mahadan-form-grid {
     grid-template-columns: 1fr !important;
-    gap: 24px !important;
+    gap: 20px !important;
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 480px) {
   .mahadan-amount-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
