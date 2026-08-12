@@ -68,7 +68,7 @@ jobs:
             -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
             ./scripts/ ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }}:"${{ secrets.PROD_DEPLOY_PATH || '/var/www/satwaramahamandal/Satvara Samaj Website' }}/scripts/"
 
-      - name: Execute Backend Dependencies, Prisma Generate & PM2 Restart
+      - name: Execute Backend Dependencies, Prisma Generate, Ensure Admin & PM2 Restart
         run: |
           ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER || 'root' }}@${{ secrets.PROD_SSH_HOST || '200.234.34.55' }} << 'EOF'
             set -e
@@ -79,6 +79,9 @@ jobs:
             
             echo "⚙️ Generating Prisma Client..."
             npx prisma generate
+
+            echo "👤 Verifying/Seeding Admin User..."
+            node prisma/ensure-admin.js || true
             
             echo "🔄 Restarting PM2 Application (satwara-backend)..."
             pm2 restart satwara-backend --update-env
