@@ -1,0 +1,516 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMISSION_MANAGER
+  HOSTEL_MANAGER
+  ACCOUNTS_MANAGER
+  CONTENT_MANAGER
+  COMMITTEE_MANAGER
+  WARDEN
+  VIEWER
+}
+
+enum HostelType {
+  BOYS
+  GIRLS
+  OTHER
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TRIPLE
+  DORMITORY
+}
+
+enum BedStatus {
+  VACANT
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+enum RoomStatus {
+  ACTIVE
+  MAINTENANCE
+  BLOCKED
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  CORRECTION_REQUESTED
+  VERIFIED
+  SHORTLISTED
+  SELECTED
+  HOSTEL_ALLOTTED
+  JOINED
+  REJECTED
+  CANCELLED
+  WITHDRAWN
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum StudentStatus {
+  ACTIVE
+  ALUMNI
+  EXITED
+}
+
+enum DocType {
+  PHOTO
+  ID_PROOF
+  COMMUNITY_PROOF
+  MARKSHEET
+  COLLEGE_PROOF
+  INCOME_PROOF
+  OTHER
+}
+
+model Admin {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(SUPER_ADMIN)
+  phone        String?
+  permissions  String?   @db.Text
+  isActive     Boolean   @default(true)
+  lastLogin    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  allotments   BedAllotment[]
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  adminId     Int?
+  adminName   String?
+  action      String
+  entity      String
+  entityId    String?
+  details     String?  @db.Text
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  admin       Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+}
+
+model Hostel {
+  id            Int        @id @default(autoincrement())
+  name          String
+  type          HostelType @default(BOYS)
+  address       String     @db.Text
+  city          String     @default("Ahmedabad")
+  wardenName    String?
+  wardenContact String?
+  wardenEmail   String?
+  totalCapacity Int        @default(0)
+  description   String?    @db.Text
+  image         String?
+  status        Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  buildings     Building[]
+  floors        Floor[]
+  rooms         Room[]
+  beds          Bed[]
+  students      Student[]
+  allotments    BedAllotment[]
+  feeStructures FeeStructure[]
+}
+
+model Building {
+  id          Int      @id @default(autoincrement())
+  hostelId    Int
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  floors      Floor[]
+}
+
+model Floor {
+  id          Int       @id @default(autoincrement())
+  hostelId    Int
+  buildingId  Int?
+  name        String
+  floorNumber Int
+  createdAt   DateTime  @default(now())
+
+  hostel      Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  building    Building? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+  rooms       Room[]
+}
+
+model Room {
+  id         Int        @id @default(autoincrement())
+  floorId    Int
+  hostelId   Int
+  roomNumber String
+  roomType   RoomType   @default(DOUBLE)
+  bedCount   Int        @default(2)
+  status     RoomStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now())
+
+  floor      Floor      @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  hostel     Hostel     @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  beds       Bed[]
+}
+
+model Bed {
+  id        Int       @id @default(autoincrement())
+  roomId    Int
+  hostelId  Int
+  bedLabel  String
+  status    BedStatus @default(VACANT)
+  createdAt DateTime  @default(now())
+
+  room       Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  hostel     Hostel         @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  students   Student[]
+  allotments BedAllotment[]
+}
+
+model Application {
+  id                Int               @id @default(autoincrement())
+  applicationNumber String            @unique
+  hostelType        HostelType        @default(BOYS)
+  status            ApplicationStatus @default(SUBMITTED)
+  submittedAt       DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  applicantDetails  ApplicantDetails?
+  familyDetails     FamilyDetails?
+  academicDetails   AcademicDetails?
+  hostelPreference  HostelPreference?
+  documents         ApplicationDocument[]
+  student           Student?
+  meritEntries      MeritListEntry[]
+  feePayments       FeePayment[]
+}
+
+model ApplicantDetails {
+  id               Int         @id @default(autoincrement())
+  applicationId    Int         @unique
+  firstName        String
+  middleName       String
+  lastName         String
+  dob              DateTime
+  gender           String
+  mobile           String
+  email            String?
+  photoPath        String?
+  subCaste         String?     @default("Satvara")
+  bloodGroup       String?
+  permanentAddress String      @db.Text
+  city             String
+  district         String
+  state            String      @default("Gujarat")
+  pincode          String
+
+  application      Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model FamilyDetails {
+  id             Int         @id @default(autoincrement())
+  applicationId  Int         @unique
+  fatherName     String
+  fatherOccupation String?
+  fatherMobile   String
+  motherName     String?
+  guardianName   String?
+  annualIncome   Float?
+  emergencyContact String
+  familyAddress  String?     @db.Text
+
+  application    Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model AcademicDetails {
+  id                 Int         @id @default(autoincrement())
+  applicationId      Int         @unique
+  courseName         String
+  collegeName        String
+  university         String
+  currentYearSem     String
+  sscPercentage      Float?
+  hscPercentage      Float?
+  lastExamPercentage Float
+  admissionProofNo   String?
+
+  application        Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model HostelPreference {
+  id                  Int         @id @default(autoincrement())
+  applicationId       Int         @unique
+  hostelId            Int?
+  preferredRoomType   RoomType?   @default(DOUBLE)
+  expectedJoiningDate DateTime?
+  foodRequired        Boolean     @default(true)
+  medicalCondition    String?
+  specialRequest      String?
+
+  application         Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model ApplicationDocument {
+  id                 Int                @id @default(autoincrement())
+  applicationId      Int
+  docType            DocType
+  fileName           String
+  filePath           String
+  fileSize           Int?
+  verificationStatus VerificationStatus @default(PENDING)
+  rejectionReason    String?
+  uploadedAt         DateTime           @default(now())
+
+  application        Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model OtpVerification {
+  id           Int       @id @default(autoincrement())
+  mobile       String
+  otpCodeHash  String
+  purpose      String    @default("APPLICATION_VERIFY")
+  expiresAt    DateTime
+  verifiedAt   DateTime?
+  attemptCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+}
+
+model Student {
+  id            Int           @id @default(autoincrement())
+  applicationId Int           @unique
+  studentCode   String        @unique
+  hostelId      Int?
+  roomId        Int?
+  bedId         Int?
+  status        StudentStatus @default(ACTIVE)
+  result        String?
+  joiningDate   DateTime?     @default(now())
+  expiringDate  DateTime?
+  checkoutDate  DateTime?
+  createdAt     DateTime      @default(now())
+
+  application   Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  hostel        Hostel?       @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  bed           Bed?          @relation(fields: [bedId], references: [id], onDelete: SetNull)
+  allotments    BedAllotment[]
+  feePayments   FeePayment[]
+}
+
+model BedAllotment {
+  id               Int       @id @default(autoincrement())
+  studentId        Int
+  bedId            Int
+  hostelId         Int
+  allottedAt       DateTime  @default(now())
+  vacatedAt        DateTime?
+  allottedByAdminId Int?
+  remarks          String?
+
+  student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  bed              Bed       @relation(fields: [bedId], references: [id], onDelete: Cascade)
+  hostel           Hostel    @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  admin            Admin?    @relation(fields: [allottedByAdminId], references: [id], onDelete: SetNull)
+}
+
+model MeritList {
+  id            Int              @id @default(autoincrement())
+  title         String
+  hostelType    HostelType       @default(BOYS)
+  academicYear  String           @default("2026-2027")
+  isPublished   Boolean          @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime         @default(now())
+
+  entries       MeritListEntry[]
+}
+
+model MeritListEntry {
+  id            Int         @id @default(autoincrement())
+  meritListId   Int
+  applicationId Int
+  rank          Int
+  category      String?     @default("General")
+  totalMarksPct Float
+  status        String      @default("SELECTED")
+
+  meritList     MeritList   @relation(fields: [meritListId], references: [id], onDelete: Cascade)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model FeeStructure {
+  id              Int      @id @default(autoincrement())
+  hostelId        Int
+  academicYear    String   @default("2026-2027")
+  admissionFee    Float    @default(2000)
+  monthlyFee      Float    @default(1500)
+  securityDeposit Float    @default(3000)
+  messFee         Float    @default(2500)
+  createdAt       DateTime @default(now())
+
+  hostel          Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+}
+
+model FeePayment {
+  id            Int         @id @default(autoincrement())
+  studentId     Int?
+  applicationId Int?
+  receiptNo     String      @unique
+  amount        Float
+  paymentMode   String      @default("CASH")
+  paymentType   String      @default("ADMISSION_FEE")
+  paymentDate   DateTime    @default(now())
+  status        String      @default("PAID")
+  remarks       String?
+
+  student       Student?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model News {
+  id            Int      @id @default(autoincrement())
+  titleGu       String   @db.Text
+  titleEn       String   @db.Text
+  contentGu     String   @db.Text
+  contentEn     String   @db.Text
+  featuredImage String?
+  pdfAttachment String?
+  isPublished   Boolean  @default(true)
+  publishedDate DateTime @default(now())
+  createdAt     DateTime @default(now())
+}
+
+model Publication {
+  id          Int      @id @default(autoincrement())
+  titleGu     String
+  titleEn     String
+  month       String
+  year        String
+  coverImage  String?
+  pdfFile     String
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model GalleryAlbum {
+  id         Int           @id @default(autoincrement())
+  titleGu    String
+  titleEn    String
+  coverImage String?
+  eventDate  DateTime?
+  createdAt  DateTime      @default(now())
+
+  items      GalleryItem[]
+}
+
+model GalleryItem {
+  id        Int          @id @default(autoincrement())
+  albumId   Int
+  itemType  String       @default("PHOTO")
+  filePath  String?
+  videoUrl  String?
+  caption   String?
+
+  album     GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+}
+
+model Download {
+  id            Int      @id @default(autoincrement())
+  titleGu       String
+  titleEn       String
+  category      String   @default("NOTICES")
+  filePath      String
+  fileSize      String?  @default("1.2 MB")
+  publishedDate DateTime @default(now())
+}
+
+model CommitteeMember {
+  id            Int     @id @default(autoincrement())
+  nameGu        String
+  nameEn        String
+  designationGu String
+  designationEn String
+  bioGu         String? @db.Text
+  bioEn         String? @db.Text
+  photoPath     String?
+  displayOrder  Int     @default(0)
+  isActive      Boolean @default(true)
+  termPeriod    String? @default("2024-2027")
+}
+
+model Page {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  titleGu   String
+  titleEn   String
+  contentGu String   @db.Text
+  contentEn String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String @db.Text
+}
+
+model Enquiry {
+  id          Int      @id @default(autoincrement())
+  enquiryType String   @default("GENERAL")
+  name        String
+  mobile      String
+  email       String?
+  city        String?
+  subject     String?
+  message     String   @db.Text
+  hostelType  String?
+  checkInDate DateTime?
+  checkOutDate DateTime?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+}
+
+model MahaDan {
+  id                 Int      @id @default(autoincrement())
+  certificateNo      String   @unique
+  donorName          String
+  mobile             String
+  email              String?
+  photoPath          String?  @db.LongText
+  amount             Float
+  paymentMode        String   @default("UPI_QR")
+  transactionId      String?
+  paymentScreenshot  String?  @db.LongText
+  verificationStatus String   @default("UNDER_VERIFICATION")
+  rejectionReason    String?  @db.Text
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  paymentStatus      String   @default("PENDING")
+  message            String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+

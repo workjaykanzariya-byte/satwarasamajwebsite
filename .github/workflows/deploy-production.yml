@@ -1,0 +1,51 @@
+name: Production CI/CD Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Sync & Deploy to Production VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+
+      - name: Add Host to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.PROD_SSH_PORT || 22 }} -H "${{ secrets.PROD_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Sync Repository Files (with Deletion Synchronization)
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.PROD_SSH_PORT || 22 }}" \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='backend/node_modules' \
+            --exclude='frontend/node_modules' \
+            --exclude='frontend/dist' \
+            --exclude='backend/uploads' \
+            ./ ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:"${{ secrets.PROD_DEPLOY_PATH }}/"
+
+      - name: Execute Server Deployment & Health Check
+        run: |
+          ssh -p ${{ secrets.PROD_SSH_PORT || 22 }} ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} "bash '${{ secrets.PROD_DEPLOY_PATH }}/scripts/deploy-production.sh'"
+
+      - name: Public Health Check
+        run: |
+          curl -k -fsS -I https://satwaramahamandal.org/
+          curl -k -fsS https://satwaramahamandal.org/api/v1/health
+          echo "✅ Production Deployment & Public Health Check Succeeded!"

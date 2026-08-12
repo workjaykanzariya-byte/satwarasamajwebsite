@@ -1,0 +1,16 @@
+{
+  "name": "satvara-samaj-website",
+  "version": "1.0.0",
+  "description": "Shree Satwara Maha Mandal Website & Hostel Admission Management System",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "seed": "cd backend && npm run prisma:seed",
+    "db:push": "cd backend && npm run prisma:db-push"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
