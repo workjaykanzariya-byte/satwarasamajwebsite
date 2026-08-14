@@ -42,61 +42,61 @@ export default function Home() {
   return (
     <div>
       {/* Hero Banner */}
-      <section style={{
-        background: 'linear-gradient(135deg, var(--primary-navy) 0%, #111827 100%)',
-        color: '#ffffff',
-        padding: '60px 0 80px 0',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+      <section className="home-hero-section">
         <div className="container">
           <div style={{ maxWidth: '850px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(217, 119, 6, 0.2)', border: '1px solid var(--accent-gold)', padding: '5px 14px', borderRadius: 'var(--radius-full)', color: 'var(--accent-amber)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '20px' }}>
+            <div className="home-hero-badge">
               <ShieldCheck size={15} /> Official Community Trust Portal | {t('trust_reg')}
             </div>
-            <h1 className="heading-serif" style={{ fontSize: '2.6rem', lineHeight: 1.25, color: '#ffffff', marginBottom: '18px' }}>
+            <h1 className="heading-serif home-hero-title">
               {t('hero_title')}
             </h1>
-            <p style={{ fontSize: '1.05rem', color: '#cbd5e1', marginBottom: '30px', lineHeight: 1.6 }}>
+            <p className="home-hero-sub">
               {t('hero_subtitle')}
             </p>
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-              <Link to="/apply" className="btn btn-accent btn-lg">
+
+            <div className="home-hero-btn-group">
+              <Link to="/apply" className="btn btn-accent btn-lg home-hero-btn-primary">
                 {t('apply_now')} <ArrowRight size={18} />
               </Link>
-              <Link to="/hostels" className="btn btn-outline btn-lg" style={{ borderColor: '#ffffff', color: '#ffffff' }}>
-                {t('check_vacancy')}
-              </Link>
-              <Link to="/admission/track" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.1)', color: '#ffffff' }}>
-                {t('track_application')}
-              </Link>
+              <div className="home-hero-btn-row">
+                <Link to="/hostels" className="btn btn-outline btn-lg home-hero-btn-secondary" style={{ borderColor: '#ffffff', color: '#ffffff' }}>
+                  {t('check_vacancy')}
+                </Link>
+                <Link to="/admission/track" className="btn btn-lg home-hero-btn-secondary" style={{ background: 'rgba(255,255,255,0.1)', color: '#ffffff' }}>
+                  {t('track_application')}
+                </Link>
+              </div>
             </div>
 
             {/* Maha Dan Total Donation & Donors Counter Banner */}
             <div className="home-mahadan-counter-card">
-              <div className="home-mahadan-counter-left">
+              <div className="home-mahadan-counter-header">
                 <div className="home-mahadan-counter-icon">
-                  <Heart size={24} fill="#FFFFFF" color="#FFFFFF" />
+                  <Heart size={22} fill="#FFFFFF" color="#FFFFFF" />
                 </div>
                 <div>
                   <div className="home-mahadan-counter-badge">
                     ✨ SATWARA MAHA DAN COUNTER
                   </div>
-                  <div className="home-mahadan-counter-stats">
-                    <div className="home-mahadan-stat-item">
-                      <span className="home-mahadan-stat-label">Total Donation Received: </span>
-                      <strong className="home-mahadan-stat-val">
-                        ₹ {Number(mahadanStats.totalAmount || 0).toLocaleString('en-IN')}
-                      </strong>
-                    </div>
-                    <div className="home-mahadan-stat-divider" />
-                    <div className="home-mahadan-stat-item">
-                      <span className="home-mahadan-stat-label">Total Verified Donors: </span>
-                      <strong className="home-mahadan-stat-val-gold">
-                        {mahadanStats.totalDonors || 0} Donors
-                      </strong>
-                    </div>
+                  <div className="home-mahadan-counter-sub">
+                    Live Community Contributions
                   </div>
+                </div>
+              </div>
+
+              <div className="home-mahadan-counter-stats-grid">
+                <div className="home-mahadan-stat-box">
+                  <span className="home-mahadan-stat-label">Total Donation Received</span>
+                  <strong className="home-mahadan-stat-val">
+                    ₹ {Number(mahadanStats.totalAmount || 0).toLocaleString('en-IN')}
+                  </strong>
+                </div>
+                <div className="home-mahadan-stat-box">
+                  <span className="home-mahadan-stat-label">Total Verified Donors</span>
+                  <strong className="home-mahadan-stat-val-gold">
+                    {mahadanStats.totalDonors || 0} Donors
+                  </strong>
                 </div>
               </div>
 
@@ -113,58 +113,58 @@ export default function Home() {
       </section>
 
       {/* Trust Summary Strip */}
-      <section style={{ marginTop: '-35px', position: 'relative', zIndex: 10 }}>
+      <section className="home-trust-summary-section">
         <div className="container">
-          <div className="card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', background: '#ffffff', borderTop: '4px solid var(--primary-maroon)', padding: '20px' }}>
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#ffedd5', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="card trust-summary-card">
+            <div className="trust-summary-item">
+              <div className="trust-summary-icon" style={{ background: '#ffedd5', color: '#ea580c' }}>
                 <Heart size={22} fill="#ea580c" />
               </div>
               <div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>
+                <div className="trust-summary-val">
                   ₹ {Number(mahadanStats.totalAmount || 0).toLocaleString('en-IN')}
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Maha Dan ({mahadanStats.totalDonors || 0} Donors)</div>
+                <div className="trust-summary-label">Maha Dan ({mahadanStats.totalDonors || 0} Donors)</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#fef3c7', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="trust-summary-item">
+              <div className="trust-summary-icon" style={{ background: '#fef3c7', color: 'var(--accent-gold)' }}>
                 <Award size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>30+ Years</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Community Service</div>
+                <div className="trust-summary-val">30+ Years</div>
+                <div className="trust-summary-label">Community Service</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="trust-summary-item">
+              <div className="trust-summary-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
                 <Users size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2,500+</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Students Housed</div>
+                <div className="trust-summary-val">2,500+</div>
+                <div className="trust-summary-label">Students Housed</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="trust-summary-item">
+              <div className="trust-summary-icon" style={{ background: '#dcfce7', color: '#166534' }}>
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2 Hostels</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Boys & Girls Complexes</div>
+                <div className="trust-summary-val">2 Hostels</div>
+                <div className="trust-summary-label">Boys & Girls Complexes</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#fae8ff', color: '#a21caf', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="trust-summary-item full-width-mobile">
+              <div className="trust-summary-icon" style={{ background: '#fae8ff', color: '#a21caf' }}>
                 <BookOpen size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>100% Merit</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Transparent Admission</div>
+                <div className="trust-summary-val">100% Merit</div>
+                <div className="trust-summary-label">Transparent Admission</div>
               </div>
             </div>
           </div>

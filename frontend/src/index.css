@@ -982,31 +982,80 @@ img, video, iframe {
   }
 }
 
-/* Home Screen Hero Maha Dan Counter Card & Mobile Responsiveness */
+/* Home Screen Hero Banner & Mobile Responsiveness */
+.home-hero-section {
+  background: linear-gradient(135deg, var(--primary-navy) 0%, #111827 100%);
+  color: #ffffff;
+  padding: 60px 0 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(217, 119, 6, 0.2);
+  border: 1px solid var(--accent-gold);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  color: var(--accent-amber);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.home-hero-title {
+  font-size: 2.6rem;
+  line-height: 1.25;
+  color: #ffffff;
+  margin-bottom: 18px;
+}
+
+.home-hero-sub {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.home-hero-btn-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.home-hero-btn-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* Home Screen Hero Maha Dan Counter Card */
 .home-mahadan-counter-card {
   margin-top: 32px;
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.18) 0%, rgba(217, 119, 6, 0.28) 100%);
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(17, 24, 39, 0.6) 100%);
   border: 1.5px solid #F59E0B;
   border-radius: 16px;
-  padding: 18px 24px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
-  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.2);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.25);
+  backdrop-filter: blur(12px);
 }
 
-.home-mahadan-counter-left {
+.home-mahadan-counter-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .home-mahadan-counter-icon {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, #EA580C, #D97706);
   color: #FFFFFF;
@@ -1018,30 +1067,36 @@ img, video, iframe {
 }
 
 .home-mahadan-counter-badge {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: #FFD700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
 
-.home-mahadan-counter-stats {
-  display: flex;
-  gap: 20px;
-  margin-top: 4px;
-  align-items: baseline;
-  flex-wrap: wrap;
+.home-mahadan-counter-sub {
+  font-size: 0.76rem;
+  color: #94A3B8;
+  margin-top: 2px;
 }
 
-.home-mahadan-stat-item {
+.home-mahadan-counter-stats-grid {
   display: flex;
-  align-items: baseline;
-  gap: 4px;
+  gap: 24px;
+  align-items: center;
+}
+
+.home-mahadan-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .home-mahadan-stat-label {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: #CBD5E1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .home-mahadan-stat-val {
@@ -1054,13 +1109,6 @@ img, video, iframe {
   font-size: 1.4rem;
   color: #FFD700;
   font-weight: 900;
-}
-
-.home-mahadan-stat-divider {
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.25);
-  align-self: center;
 }
 
 .home-mahadan-btn {
@@ -1078,46 +1126,171 @@ img, video, iframe {
   gap: 8px !important;
 }
 
+/* Home Trust Summary Strip */
+.home-trust-summary-section {
+  margin-top: -35px;
+  position: relative;
+  z-index: 10;
+}
+
+.trust-summary-card {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 16px !important;
+  background: #ffffff !important;
+  border-top: 4px solid var(--primary-maroon) !important;
+  padding: 20px !important;
+}
+
+.trust-summary-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.trust-summary-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trust-summary-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary-navy);
+  line-height: 1.2;
+}
+
+.trust-summary-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Tablet & Mobile Media Queries (< 768px) */
+@media (max-width: 768px) {
+  .home-hero-section {
+    padding: 36px 0 48px 0 !important;
+  }
+
+  .home-hero-title {
+    font-size: 1.75rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .home-hero-sub {
+    font-size: 0.92rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  .home-hero-btn-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .home-hero-btn-primary {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .home-hero-btn-row {
+    display: flex !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .home-hero-btn-secondary {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 0.85rem !important;
+    padding: 10px 12px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Prevent overlapping collision on mobile */
+  .home-trust-summary-section {
+    margin-top: 18px !important;
+  }
+
+  /* 2-column grid layout for Trust Summary Strip on Mobile */
+  .trust-summary-card {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    padding: 16px !important;
+  }
+
+  .trust-summary-item.full-width-mobile {
+    grid-column: 1 / -1 !important;
+    justify-content: center !important;
+    background: #f8fafc;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Smartphone Media Queries (< 640px) */
 @media (max-width: 640px) {
   .home-mahadan-counter-card {
     padding: 16px;
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
-    margin-top: 24px;
+    gap: 14px;
+    margin-top: 20px;
+    border-radius: 14px;
   }
 
-  .home-mahadan-counter-left {
-    align-items: flex-start;
+  .home-mahadan-counter-header {
+    align-items: center;
     gap: 12px;
   }
 
   .home-mahadan-counter-icon {
-    width: 44px;
-    height: 44px;
-    margin-top: 2px;
+    width: 40px;
+    height: 40px;
   }
 
-  .home-mahadan-counter-stats {
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-start;
-    margin-top: 6px;
+  .home-mahadan-counter-badge {
+    font-size: 0.78rem;
   }
 
-  .home-mahadan-stat-divider {
-    display: none;
+  /* Executive 2-column mobile stat boxes */
+  .home-mahadan-counter-stats-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    background: rgba(0, 0, 0, 0.28);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+  }
+
+  .home-mahadan-stat-box {
+    text-align: center;
+    padding: 4px;
+  }
+
+  .home-mahadan-stat-label {
+    font-size: 0.68rem;
+    color: #CBD5E1;
   }
 
   .home-mahadan-stat-val,
   .home-mahadan-stat-val-gold {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    margin-top: 2px;
   }
 
   .home-mahadan-btn {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    justify-content: center !important;
     padding: 12px 16px !important;
+    font-size: 0.9rem !important;
   }
 }
+
 
