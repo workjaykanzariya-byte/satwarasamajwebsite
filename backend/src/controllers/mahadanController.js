@@ -418,6 +418,164 @@ const getPublicStats = async (req, res, next) => {
   }
 };
 
+/**
+ * Helper to parse CSV string content into array of row objects
+ */
+const parseCSV = (csvText) => {
+  if (!csvText || typeof csvText !== 'string') return [];
+  const lines = csvText.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return [];
+
+  const parseRow = (text) => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result.map((val) => val.replace(/^"|"$/g, '').trim());
+  };
+
+  const headers = parseRow(lines[0]).map((h) => h.toLowerCase());
+  const rows = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseRow(lines[i]);
+    if (values.length === 0 || (values.length === 1 && !values[0])) continue;
+    const row = {};
+    headers.forEach((h, idx) => {
+      row[h] = values[idx] !== undefined ? values[idx] : '';
+    });
+    rows.push(row);
+  }
+
+  return rows;
+};
+
+/**
+ * Admin: Bulk Import Maha Dan Donors via CSV File or Data
+ */
+const importCSVDonations = async (req, res, next) => {
+  try {
+    let csvContent = '';
+
+    if (req.file) {
+      csvContent = fs.readFileSync(req.file.path, 'utf8');
+    } else if (req.body && req.body.csvData) {
+      csvContent = req.body.csvData;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'No CSV file or CSV text content uploaded.',
+      });
+    }
+
+    const rows = parseCSV(csvContent);
+    if (!rows || rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'The uploaded CSV file is empty or formatted incorrectly.',
+      });
+    }
+
+    const createdDonations = [];
+    const failedRows = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const donorName = row.donorname || row['donor name'] || row.name || row.donor_name || '';
+      const amountRaw = row.amount || row.donationamount || row['amount (₹)'] || '';
+      const mobile = row.mobile || row.phone || row['mobile number'] || 'N/A';
+      const email = row.email || row['email address'] || null;
+      let certificateNo = row.certificateno || row.certificate_no || row['certificate no'] || '';
+      let transactionId = row.transactionid || row.transaction_id || row['utr / transaction id'] || '';
+      const paymentMode = row.paymentmode || row.payment_mode || row['payment mode'] || 'OFFLINE_IMPORT';
+      const verificationStatusRaw = (row.verificationstatus || row.status || row.verification_status || 'APPROVED').toUpperCase();
+      const message = row.message || row.remarks || row.note || null;
+
+      // Mandatory Field Validations
+      if (!donorName || !donorName.trim()) {
+        failedRows.push({ rowNumber: i + 2, reason: 'Donor Name is mandatory.' });
+        continue;
+      }
+
+      const parsedAmount = parseFloat(amountRaw);
+      if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        failedRows.push({ rowNumber: i + 2, donorName, reason: 'Valid Donation Amount is mandatory.' });
+        continue;
+      }
+
+      // Auto-generate Certificate Number if not provided
+      if (!certificateNo.trim()) {
+        const uniqueNum = Math.floor(10000 + Math.random() * 90000);
+        certificateNo = `MD-2026-${uniqueNum}`;
+      }
+
+      // Check certificateNo uniqueness
+      const existingCert = await prisma.mahaDan.findUnique({ where: { certificateNo } });
+      if (existingCert) {
+        const uniqueNum = Math.floor(10000 + Math.random() * 90000);
+        certificateNo = `MD-2026-${uniqueNum}`;
+      }
+
+      if (!transactionId.trim()) {
+        transactionId = `IMP-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+      }
+
+      const validStatus = ['APPROVED', 'UNDER_VERIFICATION', 'REJECTED'].includes(verificationStatusRaw)
+        ? verificationStatusRaw
+        : 'APPROVED';
+
+      const paymentStatus = validStatus === 'APPROVED' ? 'SUCCESS' : validStatus === 'REJECTED' ? 'FAILED' : 'PENDING';
+
+      try {
+        const newDonation = await prisma.mahaDan.create({
+          data: {
+            certificateNo,
+            donorName: donorName.trim(),
+            mobile: mobile.trim() ? mobile.trim() : 'N/A',
+            email: email && email.trim() ? email.trim() : null,
+            amount: parsedAmount,
+            paymentMode: paymentMode.trim() ? paymentMode.trim() : 'OFFLINE_IMPORT',
+            transactionId,
+            verificationStatus: validStatus,
+            paymentStatus,
+            message: message && message.trim() ? message.trim() : null,
+          },
+        });
+        createdDonations.push(newDonation);
+      } catch (err) {
+        console.error(`Failed to insert CSV row ${i + 2}:`, err);
+        failedRows.push({ rowNumber: i + 2, donorName, reason: err.message || 'Database insert error' });
+      }
+    }
+
+    // Clean up uploaded file if temporary file on disk
+    if (req.file && fs.existsSync(req.file.path)) {
+      try { fs.unlinkSync(req.file.path); } catch (e) {}
+    }
+
+    return res.json({
+      success: true,
+      message: `CSV Import completed. ${createdDonations.length} donor record(s) imported successfully.${failedRows.length > 0 ? ` ${failedRows.length} row(s) failed.` : ''}`,
+      importedCount: createdDonations.length,
+      failedCount: failedRows.length,
+      failedRows,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   submitQRPayment,
   trackDonationStatus,
@@ -429,6 +587,8 @@ module.exports = {
   deleteDonation,
   bulkDeleteDonations,
   getPublicStats,
+  importCSVDonations,
 };
+
 
 

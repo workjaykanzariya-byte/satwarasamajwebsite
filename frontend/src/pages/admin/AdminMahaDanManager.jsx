@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import MahaDanCreativeCard from '../../components/common/MahaDanCreativeCard';
-import { Heart, Search, CheckCircle, XCircle, Eye, Download, ShieldCheck, DollarSign, Award, RefreshCw, User, Image as ImageIcon, X, Palette, Trash2, Power, QrCode, Upload } from 'lucide-react';
+import { Heart, Search, CheckCircle, XCircle, Eye, Download, ShieldCheck, DollarSign, Award, RefreshCw, User, Image as ImageIcon, X, Palette, Trash2, Power, QrCode, Upload, FileSpreadsheet } from 'lucide-react';
 
 const getImageUrl = (path) => {
   if (!path) return null;
@@ -42,6 +42,70 @@ export default function AdminMahaDanManager() {
   const [currentQR, setCurrentQR] = useState(null);
   const [qrUploading, setQrUploading] = useState(false);
   const [qrFile, setQrFile] = useState(null);
+
+  // CSV Import State
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [importingCSV, setImportingCSV] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+
+  // Download Sample CSV Template
+  const handleDownloadSampleCSV = () => {
+    const csvTemplate = `donorName,amount,mobile,email,certificateNo,transactionId,paymentMode,verificationStatus,message
+Ramesh Bhai Satvara,5000,9876543210,ramesh@example.com,,,OFFLINE_IMPORT,APPROVED,Hostel welfare donation
+Kantesh Kumar Satvara,1000,9825012345,kantesh@example.com,,,CASH,APPROVED,Maha Dan contribution
+Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
+
+    const blob = new Blob([csvTemplate], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'mahadan_donors_import_template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Upload & Process CSV File
+  const handleCSVImportSubmit = async (e) => {
+    e.preventDefault();
+    if (!csvFile) {
+      alert('Please select a CSV file to upload.');
+      return;
+    }
+
+    setImportingCSV(true);
+    setImportResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('csvFile', csvFile);
+
+      const res = await api.post('/mahadan/admin/import-csv', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (res.data.success) {
+        setImportResult({
+          success: true,
+          message: res.data.message,
+          importedCount: res.data.importedCount,
+          failedCount: res.data.failedCount,
+          failedRows: res.data.failedRows || [],
+        });
+        setCsvFile(null);
+        fetchDonations();
+      } else {
+        alert(res.data.message || 'Failed to import CSV.');
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to import CSV file. Please check file format.';
+      alert(msg);
+    } finally {
+      setImportingCSV(false);
+    }
+  };
 
   useEffect(() => {
     fetchDonations();
@@ -261,13 +325,35 @@ export default function AdminMahaDanManager() {
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
+            onClick={() => {
+              setShowImportModal(true);
+              setImportResult(null);
+              setCsvFile(null);
+            }}
+            className="btn"
+            style={{
+              background: 'linear-gradient(135deg, #0F172A, #1E3A8A)',
+              color: '#FFFFFF',
+              fontWeight: 'bold',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.25)',
+            }}
+          >
+            <FileSpreadsheet size={18} /> 📥 Import Donors (CSV)
+          </button>
+          <button
             onClick={togglePortalStatus}
             disabled={updatingStatus}
             className="btn"
             style={{ background: portalStatus === 'OPEN' ? '#166534' : '#DC2626', color: '#FFFFFF', fontWeight: 'bold', border: 'none', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', cursor: 'pointer' }}
           >
             <Power size={18} />
-            {portalStatus === 'OPEN' ? '🟢 Portal: OPEN (Click to Close)' : '🔴 Portal: CLOSED (Click to Open)'}
+            {portalStatus === 'OPEN' ? '🟢 Portal: OPEN' : '🔴 Portal: CLOSED'}
           </button>
           <button className="btn btn-outline" onClick={fetchDonations} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <RefreshCw size={16} /> Refresh
@@ -611,6 +697,119 @@ export default function AdminMahaDanManager() {
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button type="button" className="btn btn-outline" onClick={() => setRejectModalItem(null)} style={{ flex: 1 }}>Cancel</button>
                 <button type="submit" className="btn" style={{ background: '#DC2626', color: '#FFF', fontWeight: 'bold', flex: 1 }}>Confirm Reject</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CSV IMPORT MODAL */}
+      {showImportModal && (
+        <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '640px', padding: '28px', background: '#FFFFFF' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
+              <h3 style={{ fontSize: '1.3rem', color: 'var(--primary-navy)', margin: 0, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <FileSpreadsheet size={24} color="var(--primary-maroon)" /> Bulk Import Maha Dan Donors (CSV)
+              </h3>
+              <button onClick={() => setShowImportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Field Specifications (Mandatory vs Optional) */}
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+              <div style={{ fontWeight: 800, fontSize: '0.88rem', color: 'var(--primary-navy)', marginBottom: '10px' }}>
+                📋 CSV Format & Field Requirements:
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.82rem' }}>
+                <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', padding: '10px 12px', borderRadius: '8px' }}>
+                  <strong style={{ color: '#991B1B', display: 'block', marginBottom: '4px' }}>🔴 Mandatory Fields:</strong>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: '#7F1D1D', lineHeight: '1.5' }}>
+                    <li><code>donorName</code> (Full Name)</li>
+                    <li><code>amount</code> (Donation ₹)</li>
+                  </ul>
+                </div>
+                <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', padding: '10px 12px', borderRadius: '8px' }}>
+                  <strong style={{ color: '#166534', display: 'block', marginBottom: '4px' }}>🟢 Optional Fields:</strong>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: '#14532D', lineHeight: '1.5' }}>
+                    <li><code>mobile</code> (default 'N/A')</li>
+                    <li><code>email</code></li>
+                    <li><code>certificateNo</code> (auto-gen)</li>
+                    <li><code>transactionId</code> / <code>paymentMode</code></li>
+                    <li><code>verificationStatus</code> (default APPROVED)</li>
+                    <li><code>message</code></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Sample CSV Download Strip */}
+            <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '12px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap' }}>
+              <div>
+                <strong style={{ color: '#B45309', fontSize: '0.88rem' }}>Need standard template?</strong>
+                <div style={{ fontSize: '0.8rem', color: '#92400E' }}>Download sample CSV file pre-formatted with column headers & sample data.</div>
+              </div>
+              <button
+                type="button"
+                onClick={handleDownloadSampleCSV}
+                className="btn btn-outline btn-sm"
+                style={{ background: '#FFFFFF', borderColor: '#D97706', color: '#B45309', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+              >
+                <Download size={14} /> Download Sample CSV
+              </button>
+            </div>
+
+            {/* CSV File Upload Form */}
+            <form onSubmit={handleCSVImportSubmit}>
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--primary-navy)', display: 'block', marginBottom: '8px' }}>
+                  Select .CSV File to Import *
+                </label>
+                <input
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={(e) => setCsvFile(e.target.files[0] || null)}
+                  className="form-control"
+                  required
+                />
+                {csvFile && (
+                  <div style={{ marginTop: '6px', fontSize: '0.82rem', color: '#166534', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle size={15} /> Selected: {csvFile.name} ({(csvFile.size / 1024).toFixed(1)} KB)
+                  </div>
+                )}
+              </div>
+
+              {/* Import Results Banner */}
+              {importResult && (
+                <div style={{ marginBottom: '20px', background: importResult.failedCount > 0 ? '#FEF2F2' : '#F0FDF4', border: `1.5px solid ${importResult.failedCount > 0 ? '#FCA5A5' : '#86EFAC'}`, borderRadius: '12px', padding: '14px' }}>
+                  <div style={{ fontWeight: 'bold', color: importResult.failedCount > 0 ? '#991B1B' : '#166534', fontSize: '0.92rem', marginBottom: '4px' }}>
+                    {importResult.message}
+                  </div>
+                  {importResult.failedRows && importResult.failedRows.length > 0 && (
+                    <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#991B1B' }}>
+                      <strong>Failed Row Details:</strong>
+                      <ul style={{ margin: '4px 0 0 0', paddingLeft: '18px' }}>
+                        {importResult.failedRows.map((f, idx) => (
+                          <li key={idx}>Row {f.rowNumber}{f.donorName ? ` (${f.donorName})` : ''}: {f.reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowImportModal(false)} style={{ flex: 1 }}>
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={importingCSV || !csvFile}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (!csvFile || importingCSV) ? 0.6 : 1 }}
+                >
+                  <Upload size={18} /> {importingCSV ? 'Importing CSV Records...' : 'Upload & Import Donors'}
+                </button>
               </div>
             </form>
           </div>

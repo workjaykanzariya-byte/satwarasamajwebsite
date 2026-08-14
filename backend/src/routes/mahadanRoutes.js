@@ -10,6 +10,7 @@ const {
   deleteDonation,
   bulkDeleteDonations,
   getPublicStats,
+  importCSVDonations,
 } = require('../controllers/mahadanController');
 const { authenticateAdmin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -25,6 +26,7 @@ router.get('/certificate/:certificateNo', getCertificateDetails);
 
 // Admin Routes (Protected)
 router.get('/admin/all', authenticateAdmin, getAdminDonations);
+router.post('/admin/import-csv', authenticateAdmin, upload.single('csvFile'), importCSVDonations);
 router.get('/admin/:id', authenticateAdmin, getAdminDonationById);
 router.put('/admin/:id/verify', authenticateAdmin, verifyDonationByAdmin);
 router.delete('/admin/bulk', authenticateAdmin, bulkDeleteDonations);
