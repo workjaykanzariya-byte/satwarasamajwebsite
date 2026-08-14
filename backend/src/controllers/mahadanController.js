@@ -386,6 +386,38 @@ const bulkDeleteDonations = async (req, res, next) => {
   }
 };
 
+/**
+ * Public: Get Total Maha Dan Statistics (Approved amount & donor count)
+ */
+const getPublicStats = async (req, res, next) => {
+  try {
+    const donations = await prisma.mahaDan.findMany({
+      where: {
+        OR: [
+          { verificationStatus: 'APPROVED' },
+          { paymentStatus: 'SUCCESS' },
+        ],
+      },
+      select: {
+        amount: true,
+      },
+    });
+
+    const totalAmount = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+    const totalDonors = donations.length;
+
+    return res.json({
+      success: true,
+      stats: {
+        totalAmount,
+        totalDonors,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   submitQRPayment,
   trackDonationStatus,
@@ -396,5 +428,7 @@ module.exports = {
   getAdminDonationById,
   deleteDonation,
   bulkDeleteDonations,
+  getPublicStats,
 };
+
 

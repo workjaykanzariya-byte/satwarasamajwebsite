@@ -9,6 +9,7 @@ const {
   getAdminDonationById,
   deleteDonation,
   bulkDeleteDonations,
+  getPublicStats,
 } = require('../controllers/mahadanController');
 const { authenticateAdmin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -16,6 +17,7 @@ const upload = require('../middleware/uploadMiddleware');
 const router = express.Router();
 
 // Public Routes
+router.get('/public-stats', getPublicStats);
 router.post('/submit-qr-payment', submitQRPayment);
 router.get('/track/:query', trackDonationStatus);
 router.post('/create-order', upload.single('photo'), createDonationOrder);

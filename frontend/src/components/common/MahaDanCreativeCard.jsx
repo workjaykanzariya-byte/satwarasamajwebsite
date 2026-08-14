@@ -50,22 +50,77 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
 
   const isPending = donation.verificationStatus === 'UNDER_VERIFICATION' || donation.isPending;
 
-  const downloadCard = () => {
-    if (!cardRef.current) return;
-    html2canvas(cardRef.current, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#FAF8F5',
-      foreignObjectRendering: false,
-      logging: false,
-    }).then((canvas) => {
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadCard = async () => {
+    if (!cardRef.current || downloading) return;
+    setDownloading(true);
+
+    // Create an off-screen container at 1:1 scale (660px x 660px) attached to document.body
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'fixed';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '660px';
+    tempContainer.style.height = '660px';
+    tempContainer.style.transform = 'none';
+    tempContainer.style.zIndex = '-99999';
+    tempContainer.style.overflow = 'hidden';
+    tempContainer.style.background = '#FAF8F5';
+
+    // Clone the exact card element
+    const clone = cardRef.current.cloneNode(true);
+    clone.style.transform = 'none';
+    clone.style.margin = '0';
+    clone.style.width = '660px';
+    clone.style.height = '660px';
+    clone.style.position = 'relative';
+
+    tempContainer.appendChild(clone);
+    document.body.appendChild(tempContainer);
+
+    try {
+      // Ensure all images in clone are fully loaded before capturing
+      const images = Array.from(clone.querySelectorAll('img'));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      // Render canvas from unscaled off-screen clone with desktop window bounds
+      const canvas = await html2canvas(clone, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FAF8F5',
+        foreignObjectRendering: false,
+        logging: false,
+        width: 660,
+        height: 660,
+        windowWidth: 1200,
+        windowHeight: 1200,
+        scrollX: 0,
+        scrollY: 0,
+      });
+
       const link = document.createElement('a');
       const filenamePrefix = isPending ? 'Maha_Dan_Preview_Card' : 'Maha_Dan_Official_Card';
       link.download = `${filenamePrefix}_${donation.certificateNo || 'Satvara'}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-    });
+    } catch (err) {
+      console.error('Creative card download error:', err);
+    } finally {
+      if (document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer);
+      }
+      setDownloading(false);
+    }
   };
 
   const shareWhatsApp = () => {
@@ -115,6 +170,7 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
           <button
             onClick={downloadCard}
+            disabled={downloading}
             className="btn btn-primary"
             style={{
               background: isPending ? 'linear-gradient(135deg, #D97706, #B45309)' : 'linear-gradient(135deg, #EA580C, #D97706)',
@@ -127,10 +183,11 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
               padding: '12px 24px',
               fontSize: '0.95rem',
               boxShadow: '0 4px 14px rgba(217, 119, 6, 0.35)',
-              cursor: 'pointer',
+              cursor: downloading ? 'wait' : 'pointer',
+              opacity: downloading ? 0.8 : 1,
             }}
           >
-            <Download size={18} /> {isPending ? 'Download Preview Creative (PNG)' : 'Download Creative Image (PNG)'}
+            <Download size={18} /> {downloading ? 'Preparing Creative Download...' : (isPending ? 'Download Preview Creative (PNG)' : 'Download Creative Image (PNG)')}
           </button>
 
           <button
@@ -256,10 +313,10 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
 
               {/* Title Text (English & Gujarati) */}
               <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: 'sans-serif' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: 'sans-serif', lineHeight: '1.3' }}>
                   SAMAST SATWARA MAHAMANDAL
                 </h3>
-                <h2 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0F172A', margin: '2px 0 0 0', lineHeight: 1.15 }}>
+                <h2 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0F172A', margin: '4px 0 0 0', lineHeight: '1.3' }}>
                   શ્રી સમસ્ત સતવારા મહામંડળ
                 </h2>
               </div>
@@ -267,10 +324,10 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
 
             {/* Sub-Header Headline Banner */}
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
-              <h1 style={{ fontSize: '3.1rem', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: 1.05, letterSpacing: '-0.5px', fontFamily: 'serif, sans-serif' }}>
+              <h1 style={{ fontSize: '3.1rem', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: '1.2', letterSpacing: '-0.5px', fontFamily: 'serif, sans-serif' }}>
                 Donation is Love
               </h1>
-              <p style={{ margin: '6px 0 0 0', fontSize: '1.02rem', color: '#0F172A', fontWeight: 800 }}>
+              <p style={{ margin: '8px 0 0 0', fontSize: '1.02rem', color: '#0F172A', fontWeight: 800, lineHeight: '1.4' }}>
                 મહા દાન એ પ્રેમ, સામાજિક કલ્યાણ અને શિક્ષણનું પવિત્ર અનુદાન છે.
               </p>
             </div>
@@ -362,11 +419,11 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
 
-              <div style={{ fontSize: '0.82rem', fontWeight: 900, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 900, color: '#0F172A', letterSpacing: '0.5px', textTransform: 'uppercase', lineHeight: '1.3' }}>
                 HONORING AND VALUED DONOR
               </div>
 
-              <h2 style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0F172A', margin: '4px 0 12px 0', lineHeight: 1.15, textTransform: 'capitalize' }}>
+              <h2 style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0F172A', margin: '6px 0 12px 0', lineHeight: '1.3', textTransform: 'capitalize' }}>
                 {donation.donorName}
               </h2>
 
@@ -384,10 +441,10 @@ export default function MahaDanCreativeCard({ donation, showActions = true }) {
                 minWidth: '260px',
                 boxSizing: 'border-box',
               }}>
-                <div style={{ position: 'relative', zIndex: 15, fontSize: '0.78rem', color: '#CBD5E1', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '3px' }}>
+                <div style={{ position: 'relative', zIndex: 15, fontSize: '0.78rem', color: '#CBD5E1', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px', lineHeight: '1.3' }}>
                   CONTRIBUTED MAHA DAN
                 </div>
-                <div style={{ position: 'relative', zIndex: 15, fontSize: '2.1rem', fontWeight: 900, color: '#FFD700', lineHeight: 1.2, display: 'block' }}>
+                <div style={{ position: 'relative', zIndex: 15, fontSize: '2.1rem', fontWeight: 900, color: '#FFD700', lineHeight: '1.3', display: 'block' }}>
                   ₹ {formattedAmount} /-
                 </div>
               </div>

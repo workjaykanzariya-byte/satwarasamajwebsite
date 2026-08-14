@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
-import { Building2, Award, Users, BookOpen, Calendar, CheckCircle2, ArrowRight, ShieldCheck, PhoneCall } from 'lucide-react';
+import { Building2, Award, Users, BookOpen, Calendar, CheckCircle2, ArrowRight, ShieldCheck, PhoneCall, Heart } from 'lucide-react';
 
 export default function Home() {
   const { t, lang } = useLanguage();
   const [hostels, setHostels] = useState([]);
   const [news, setNews] = useState([]);
+  const [mahadanStats, setMahadanStats] = useState({ totalAmount: 0, totalDonors: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,9 +17,10 @@ export default function Home() {
 
   const fetchHomeData = async () => {
     try {
-      const [hostelRes, newsRes] = await Promise.all([
+      const [hostelRes, newsRes, mahadanRes] = await Promise.all([
         api.get('/occupancy/summary'),
         api.get('/cms/news'),
+        api.get('/mahadan/public-stats').catch(() => null),
       ]);
 
       if (hostelRes.data.success) {
@@ -26,6 +28,9 @@ export default function Home() {
       }
       if (newsRes.data.success) {
         setNews(newsRes.data.news.slice(0, 3));
+      }
+      if (mahadanRes && mahadanRes.data && mahadanRes.data.success && mahadanRes.data.stats) {
+        setMahadanStats(mahadanRes.data.stats);
       }
     } catch (err) {
       console.error('Home data load error:', err);
@@ -45,7 +50,7 @@ export default function Home() {
         overflow: 'hidden'
       }}>
         <div className="container">
-          <div style={{ maxWidth: '800px' }}>
+          <div style={{ maxWidth: '850px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(217, 119, 6, 0.2)', border: '1px solid var(--accent-gold)', padding: '5px 14px', borderRadius: 'var(--radius-full)', color: 'var(--accent-amber)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '20px' }}>
               <ShieldCheck size={15} /> Official Community Trust Portal | {t('trust_reg')}
             </div>
@@ -66,6 +71,43 @@ export default function Home() {
                 {t('track_application')}
               </Link>
             </div>
+
+            {/* Maha Dan Total Donation & Donors Counter Banner */}
+            <div className="home-mahadan-counter-card">
+              <div className="home-mahadan-counter-left">
+                <div className="home-mahadan-counter-icon">
+                  <Heart size={24} fill="#FFFFFF" color="#FFFFFF" />
+                </div>
+                <div>
+                  <div className="home-mahadan-counter-badge">
+                    ✨ SATWARA MAHA DAN COUNTER
+                  </div>
+                  <div className="home-mahadan-counter-stats">
+                    <div className="home-mahadan-stat-item">
+                      <span className="home-mahadan-stat-label">Total Donation Received: </span>
+                      <strong className="home-mahadan-stat-val">
+                        ₹ {Number(mahadanStats.totalAmount || 0).toLocaleString('en-IN')}
+                      </strong>
+                    </div>
+                    <div className="home-mahadan-stat-divider" />
+                    <div className="home-mahadan-stat-item">
+                      <span className="home-mahadan-stat-label">Total Verified Donors: </span>
+                      <strong className="home-mahadan-stat-val-gold">
+                        {mahadanStats.totalDonors || 0} Donors
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to="/mahadan"
+                className="btn home-mahadan-btn"
+              >
+                Contribute Maha Dan <ArrowRight size={16} />
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
@@ -73,14 +115,26 @@ export default function Home() {
       {/* Trust Summary Strip */}
       <section style={{ marginTop: '-35px', position: 'relative', zIndex: 10 }}>
         <div className="container">
-          <div className="card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', background: '#ffffff', borderTop: '4px solid var(--primary-maroon)', padding: '20px' }}>
+          <div className="card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', background: '#ffffff', borderTop: '4px solid var(--primary-maroon)', padding: '20px' }}>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#ffedd5', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Heart size={22} fill="#ea580c" />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>
+                  ₹ {Number(mahadanStats.totalAmount || 0).toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Maha Dan ({mahadanStats.totalDonors || 0} Donors)</div>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
               <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#fef3c7', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Award size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-navy)' }}>30+ Years</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Community Service</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>30+ Years</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Community Service</div>
               </div>
             </div>
 
@@ -89,8 +143,8 @@ export default function Home() {
                 <Users size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2,500+</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Students Housed</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2,500+</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Students Housed</div>
               </div>
             </div>
 
@@ -99,8 +153,8 @@ export default function Home() {
                 <Building2 size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2 Hostels</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Boys & Girls Complexes</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>2 Hostels</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Boys & Girls Complexes</div>
               </div>
             </div>
 
@@ -109,8 +163,8 @@ export default function Home() {
                 <BookOpen size={22} />
               </div>
               <div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-navy)' }}>100% Merit</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Transparent Admission</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary-navy)' }}>100% Merit</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Transparent Admission</div>
               </div>
             </div>
           </div>
