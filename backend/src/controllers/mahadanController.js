@@ -314,14 +314,68 @@ const getAdminDonations = async (req, res, next) => {
     const totalDonors = approvedDonations.length;
     const pendingVerifications = donations.filter((d) => d.verificationStatus === 'UNDER_VERIFICATION').length;
 
+    // Fetch display offset settings
+    const settings = await prisma.setting.findMany({
+      where: {
+        key: {
+          in: ['mahadan_display_extra_amount', 'mahadan_display_extra_donors'],
+        },
+      },
+    });
+
+    const settingsMap = {};
+    settings.forEach((s) => {
+      settingsMap[s.key] = s.value;
+    });
+
+    const displayExtraAmount = parseFloat(settingsMap['mahadan_display_extra_amount'] || '0') || 0;
+    const displayExtraDonors = parseInt(settingsMap['mahadan_display_extra_donors'] || '0', 10) || 0;
+
     return res.json({
       success: true,
       stats: {
         totalAmount,
         totalDonors,
         pendingVerifications,
+        displayExtraAmount,
+        displayExtraDonors,
+        frontendTotalAmount: totalAmount + displayExtraAmount,
+        frontendTotalDonors: totalDonors + displayExtraDonors,
       },
       donations,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Admin: Update Frontend Display Offset Settings for Total Donation & Donors
+ */
+const updateDisplaySettings = async (req, res, next) => {
+  try {
+    const { extraAmount, extraDonors } = req.body;
+
+    const parsedExtraAmount = parseFloat(extraAmount) || 0;
+    const parsedExtraDonors = parseInt(extraDonors, 10) || 0;
+
+    await prisma.setting.upsert({
+      where: { key: 'mahadan_display_extra_amount' },
+      update: { value: String(parsedExtraAmount) },
+      create: { key: 'mahadan_display_extra_amount', value: String(parsedExtraAmount) },
+    });
+
+    await prisma.setting.upsert({
+      where: { key: 'mahadan_display_extra_donors' },
+      update: { value: String(parsedExtraDonors) },
+      create: { key: 'mahadan_display_extra_donors', value: String(parsedExtraDonors) },
+    });
+
+    return res.json({
+      success: true,
+      message: 'Frontend display donation settings updated successfully!',
+      displayExtraAmount: parsedExtraAmount,
+      displayExtraDonors: parsedExtraDonors,
     });
   } catch (error) {
     next(error);
@@ -387,7 +441,7 @@ const bulkDeleteDonations = async (req, res, next) => {
 };
 
 /**
- * Public: Get Total Maha Dan Statistics (Approved amount & donor count)
+ * Public: Get Total Maha Dan Statistics (Approved amount & donor count + Admin offset settings)
  */
 const getPublicStats = async (req, res, next) => {
   try {
@@ -403,14 +457,38 @@ const getPublicStats = async (req, res, next) => {
       },
     });
 
-    const totalAmount = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
-    const totalDonors = donations.length;
+    const realTotalAmount = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+    const realTotalDonors = donations.length;
+
+    // Fetch display offset settings
+    const settings = await prisma.setting.findMany({
+      where: {
+        key: {
+          in: ['mahadan_display_extra_amount', 'mahadan_display_extra_donors'],
+        },
+      },
+    });
+
+    const settingsMap = {};
+    settings.forEach((s) => {
+      settingsMap[s.key] = s.value;
+    });
+
+    const extraAmount = parseFloat(settingsMap['mahadan_display_extra_amount'] || '0') || 0;
+    const extraDonors = parseInt(settingsMap['mahadan_display_extra_donors'] || '0', 10) || 0;
+
+    const totalAmount = realTotalAmount + extraAmount;
+    const totalDonors = realTotalDonors + extraDonors;
 
     return res.json({
       success: true,
       stats: {
         totalAmount,
         totalDonors,
+        realTotalAmount,
+        realTotalDonors,
+        extraAmount,
+        extraDonors,
       },
     });
   } catch (error) {
@@ -583,6 +661,7 @@ module.exports = {
   createDonationOrder,
   getCertificateDetails,
   getAdminDonations,
+  updateDisplaySettings,
   getAdminDonationById,
   deleteDonation,
   bulkDeleteDonations,

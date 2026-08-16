@@ -100,8 +100,8 @@ export default function ApplicationForm() {
 
     // Fetch dynamic hostels list
     api.get('/occupancy/summary').then((res) => {
-      if (res.data.success) {
-        setHostelList(res.data.hostels || []);
+      if (res.data.success && res.data.hostels && res.data.hostels.length > 0) {
+        setHostelList(res.data.hostels);
       }
     }).catch(() => {});
   }, []);

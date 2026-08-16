@@ -4,9 +4,51 @@ import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 import { Building2, Award, Users, BookOpen, Calendar, CheckCircle2, ArrowRight, ShieldCheck, PhoneCall, Heart } from 'lucide-react';
 
+const DEFAULT_HOSTELS = [
+  {
+    id: 1,
+    name: 'Shree Satwara Boys Hostel',
+    type: 'BOYS',
+    city: 'Ahmedabad',
+    address: 'Satwara Vidyarthi Bhavan, 13 Panchalnagar Society, Behind Devashya Hospital, Old Wadaj, Ahmedabad',
+    wardenName: 'Rameshbhai Satvara',
+    wardenContact: '+91 98250 12345',
+    totalCapacity: 30,
+    occupiedBeds: 1,
+    availableBeds: 29,
+    description: 'Modern hostel facility for male Satwara students with Wi-Fi, mess, CCTV, and study library.',
+  },
+  {
+    id: 2,
+    name: 'Shree Satwara Kanya Chhatralaya (Girls Hostel)',
+    type: 'GIRLS',
+    city: 'Ahmedabad',
+    address: 'Satwara Kanya Bhavan, Nr. Naranpura Bus Stop, Naranpura, Ahmedabad',
+    wardenName: 'Kanchanben Satvara',
+    wardenContact: '+91 98250 67890',
+    totalCapacity: 12,
+    occupiedBeds: 0,
+    availableBeds: 12,
+    description: 'Secure and peaceful hostel environment for female Satwara students with 24/7 security and home-style nutritious mess.',
+  },
+  {
+    id: 3,
+    name: 'Shree Satwara Hostel, Anand (V.V. Nagar)',
+    type: 'BOYS',
+    city: 'Anand / V.V. Nagar',
+    address: 'Satwara Chhatralaya, Near Railway Station / Campus Area, Vallabh Vidyanagar, Anand - 388120',
+    wardenName: 'Pravinbhai Satvara',
+    wardenContact: '+91 98790 54321',
+    totalCapacity: 12,
+    occupiedBeds: 0,
+    availableBeds: 12,
+    description: 'Modern hostel facility in Vallabh Vidyanagar (Anand) for Satwara students pursuing Higher Education, Engineering, and Pharmacy.',
+  },
+];
+
 export default function Home() {
   const { t, lang } = useLanguage();
-  const [hostels, setHostels] = useState([]);
+  const [hostels, setHostels] = useState(DEFAULT_HOSTELS);
   const [news, setNews] = useState([]);
   const [mahadanStats, setMahadanStats] = useState({ totalAmount: 0, totalDonors: 0 });
   const [loading, setLoading] = useState(true);
@@ -18,15 +60,15 @@ export default function Home() {
   const fetchHomeData = async () => {
     try {
       const [hostelRes, newsRes, mahadanRes] = await Promise.all([
-        api.get('/occupancy/summary'),
-        api.get('/cms/news'),
+        api.get('/occupancy/summary').catch(() => null),
+        api.get('/cms/news').catch(() => null),
         api.get('/mahadan/public-stats').catch(() => null),
       ]);
 
-      if (hostelRes.data.success) {
+      if (hostelRes && hostelRes.data && hostelRes.data.success && hostelRes.data.hostels && hostelRes.data.hostels.length > 0) {
         setHostels(hostelRes.data.hostels);
       }
-      if (newsRes.data.success) {
+      if (newsRes && newsRes.data && newsRes.data.success) {
         setNews(newsRes.data.news.slice(0, 3));
       }
       if (mahadanRes && mahadanRes.data && mahadanRes.data.success && mahadanRes.data.stats) {

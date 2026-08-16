@@ -6,6 +6,7 @@ const {
   createDonationOrder,
   getCertificateDetails,
   getAdminDonations,
+  updateDisplaySettings,
   getAdminDonationById,
   deleteDonation,
   bulkDeleteDonations,
@@ -26,6 +27,7 @@ router.get('/certificate/:certificateNo', getCertificateDetails);
 
 // Admin Routes (Protected)
 router.get('/admin/all', authenticateAdmin, getAdminDonations);
+router.put('/admin/display-settings', authenticateAdmin, updateDisplaySettings);
 router.post('/admin/import-csv', authenticateAdmin, upload.single('csvFile'), importCSVDonations);
 router.get('/admin/:id', authenticateAdmin, getAdminDonationById);
 router.put('/admin/:id/verify', authenticateAdmin, verifyDonationByAdmin);

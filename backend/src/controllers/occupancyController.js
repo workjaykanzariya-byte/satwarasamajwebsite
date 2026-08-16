@@ -4,7 +4,7 @@ const { logAudit } = require('../utils/auditLogger');
 // 1. Get Hostels Summary (Public & Admin)
 const getHostelsSummary = async (req, res, next) => {
   try {
-    const hostels = await prisma.hostel.findMany({
+    let hostels = await prisma.hostel.findMany({
       where: { status: true },
       include: {
         beds: {
@@ -12,6 +12,63 @@ const getHostelsSummary = async (req, res, next) => {
         },
       },
     });
+
+    // Auto-seed default hostels if database is empty
+    if (!hostels || hostels.length === 0) {
+      try {
+        await prisma.hostel.createMany({
+          data: [
+            {
+              name: 'Shree Satwara Boys Hostel',
+              type: 'BOYS',
+              address: 'Satwara Vidyarthi Bhavan, 13 Panchalnagar Society, Behind Devashya Hospital, Old Wadaj, Ahmedabad',
+              city: 'Ahmedabad',
+              wardenName: 'Rameshbhai Satvara',
+              wardenContact: '+91 98250 12345',
+              wardenEmail: 'warden.boys@satvaramahamandal.org',
+              totalCapacity: 30,
+              description: 'Modern hostel facility for male Satwara students with Wi-Fi, mess, CCTV, and study library.',
+              status: true,
+            },
+            {
+              name: 'Shree Satwara Kanya Chhatralaya (Girls Hostel)',
+              type: 'GIRLS',
+              address: 'Satwara Kanya Bhavan, Nr. Naranpura Bus Stop, Naranpura, Ahmedabad',
+              city: 'Ahmedabad',
+              wardenName: 'Kanchanben Satvara',
+              wardenContact: '+91 98250 67890',
+              wardenEmail: 'warden.girls@satvaramahamandal.org',
+              totalCapacity: 12,
+              description: 'Secure and peaceful hostel environment for female Satwara students with 24/7 security and home-style nutritious mess.',
+              status: true,
+            },
+            {
+              name: 'Shree Satwara Hostel, Anand (V.V. Nagar)',
+              type: 'BOYS',
+              address: 'Satwara Chhatralaya, Near Railway Station / Campus Area, Vallabh Vidyanagar, Anand - 388120',
+              city: 'Anand / V.V. Nagar',
+              wardenName: 'Pravinbhai Satvara',
+              wardenContact: '+91 98790 54321',
+              wardenEmail: 'warden.anand@satvaramahamandal.org',
+              totalCapacity: 12,
+              description: 'Modern hostel facility in Vallabh Vidyanagar (Anand) for Satwara students pursuing Higher Education, Engineering, and Pharmacy.',
+              status: true,
+            },
+          ],
+        });
+
+        hostels = await prisma.hostel.findMany({
+          where: { status: true },
+          include: {
+            beds: {
+              select: { id: true, status: true },
+            },
+          },
+        });
+      } catch (e) {
+        console.error('Auto-seed hostels error:', e);
+      }
+    }
 
     const summary = hostels.map((hostel) => {
       const totalBeds = hostel.beds.length;

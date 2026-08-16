@@ -21,12 +21,19 @@ export default function MahaDanPage() {
   const [activeTab, setActiveTab] = useState('donate'); // 'donate' or 'track'
   const [mahadanStatus, setMahadanStatus] = useState('OPEN');
   const [adminQrImage, setAdminQrImage] = useState(null); // Custom QR image from admin
+  const [publicStats, setPublicStats] = useState({ totalAmount: 0, totalDonors: 0 });
 
   useEffect(() => {
     api.get('/cms/settings').then((res) => {
       if (res.data.success && res.data.settings) {
         setMahadanStatus(res.data.settings.mahadan_status || 'OPEN');
         setAdminQrImage(res.data.settings.mahadan_qr_image || null);
+      }
+    }).catch(() => {});
+
+    api.get('/mahadan/public-stats').then((res) => {
+      if (res.data.success && res.data.stats) {
+        setPublicStats(res.data.stats);
       }
     }).catch(() => {});
   }, []);
@@ -278,9 +285,24 @@ export default function MahaDanPage() {
           <h1 style={{ fontSize: '2.5rem', color: '#FFFFFF', margin: '0 0 10px 0', fontWeight: 800, fontFamily: 'serif, sans-serif' }}>
             MAHA DAN PORTAL & HONOR CERTIFICATES
           </h1>
-          <p style={{ maxWidth: '720px', margin: '0 auto', color: '#F8FAFC', fontSize: '1.05rem', lineHeight: '1.6' }}>
+          <p style={{ maxWidth: '720px', margin: '0 auto 20px auto', color: '#F8FAFC', fontSize: '1.05rem', lineHeight: '1.6' }}>
             Contribute to Satwara student hostels, digital libraries, and merit scholarships with instant QR payment & personalized Honor Certificates.
           </p>
+
+          {/* Live Stats Pill Strip */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '24px', background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '50px', padding: '10px 28px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Heart size={18} fill="#F59E0B" color="#F59E0B" />
+              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>Total Donation Received:</span>
+              <strong style={{ fontSize: '1.15rem', color: '#FFD700' }}>₹ {Number(publicStats.totalAmount || 0).toLocaleString('en-IN')}</strong>
+            </div>
+            <div style={{ borderLeft: '1px solid rgba(255, 255, 255, 0.2)', height: '20px' }} className="hide-mobile"></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Award size={18} color="#60A5FA" />
+              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>Total Donors:</span>
+              <strong style={{ fontSize: '1.15rem', color: '#60A5FA' }}>{(publicStats.totalDonors || 0).toLocaleString('en-IN')} Donors</strong>
+            </div>
+          </div>
         </div>
       </section>
 

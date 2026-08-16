@@ -3,6 +3,33 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { CheckCircle, AlertTriangle, FileText, Calendar, Building2, MapPin } from 'lucide-react';
 
+const DEFAULT_HOSTELS = [
+  {
+    id: 1,
+    name: 'Shree Satwara Boys Hostel',
+    type: 'BOYS',
+    city: 'Ahmedabad',
+    address: 'Satwara Vidyarthi Bhavan, 13 Panchalnagar Society, Behind Devashya Hospital, Old Wadaj, Ahmedabad',
+    description: 'Modern hostel facility for male Satwara students with Wi-Fi, mess, CCTV, and study library.',
+  },
+  {
+    id: 2,
+    name: 'Shree Satwara Kanya Chhatralaya (Girls Hostel)',
+    type: 'GIRLS',
+    city: 'Ahmedabad',
+    address: 'Satwara Kanya Bhavan, Nr. Naranpura Bus Stop, Naranpura, Ahmedabad',
+    description: 'Secure and peaceful hostel environment for female Satwara students with 24/7 security and home-style nutritious mess.',
+  },
+  {
+    id: 3,
+    name: 'Shree Satwara Hostel, Anand (V.V. Nagar)',
+    type: 'BOYS',
+    city: 'Anand / V.V. Nagar',
+    address: 'Satwara Chhatralaya, Near Railway Station / Campus Area, Vallabh Vidyanagar, Anand - 388120',
+    description: 'Modern hostel facility in Vallabh Vidyanagar (Anand) for Satwara students pursuing Higher Education, Engineering, and Pharmacy.',
+  },
+];
+
 export default function AdmissionOverview() {
   const [settings, setSettings] = useState({
     admission_status: 'OPEN',
@@ -12,7 +39,7 @@ export default function AdmissionOverview() {
     admission_closed_notice_gu: '',
   });
 
-  const [hostels, setHostels] = useState([]);
+  const [hostels, setHostels] = useState(DEFAULT_HOSTELS);
 
   useEffect(() => {
     api.get('/cms/settings').then((res) => {
@@ -22,8 +49,8 @@ export default function AdmissionOverview() {
     }).catch(() => {});
 
     api.get('/occupancy/summary').then((res) => {
-      if (res.data.success) {
-        setHostels(res.data.hostels || []);
+      if (res.data.success && res.data.hostels && res.data.hostels.length > 0) {
+        setHostels(res.data.hostels);
       }
     }).catch(() => {});
   }, []);

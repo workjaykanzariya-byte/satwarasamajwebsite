@@ -2,13 +2,57 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
+const DEFAULT_HOSTELS = [
+  {
+    id: 1,
+    name: 'Shree Satwara Boys Hostel',
+    type: 'BOYS',
+    city: 'Ahmedabad',
+    address: 'Satwara Vidyarthi Bhavan, 13 Panchalnagar Society, Behind Devashya Hospital, Old Wadaj, Ahmedabad',
+    wardenName: 'Rameshbhai Satvara',
+    wardenContact: '+91 98250 12345',
+    totalCapacity: 30,
+    occupiedBeds: 1,
+    availableBeds: 29,
+    description: 'Modern hostel facility for male Satwara students with Wi-Fi, mess, CCTV, and study library.',
+  },
+  {
+    id: 2,
+    name: 'Shree Satwara Kanya Chhatralaya (Girls Hostel)',
+    type: 'GIRLS',
+    city: 'Ahmedabad',
+    address: 'Satwara Kanya Bhavan, Nr. Naranpura Bus Stop, Naranpura, Ahmedabad',
+    wardenName: 'Kanchanben Satvara',
+    wardenContact: '+91 98250 67890',
+    totalCapacity: 12,
+    occupiedBeds: 0,
+    availableBeds: 12,
+    description: 'Secure and peaceful hostel environment for female Satwara students with 24/7 security and home-style nutritious mess.',
+  },
+  {
+    id: 3,
+    name: 'Shree Satwara Hostel, Anand (V.V. Nagar)',
+    type: 'BOYS',
+    city: 'Anand / V.V. Nagar',
+    address: 'Satwara Chhatralaya, Near Railway Station / Campus Area, Vallabh Vidyanagar, Anand - 388120',
+    wardenName: 'Pravinbhai Satvara',
+    wardenContact: '+91 98790 54321',
+    totalCapacity: 12,
+    occupiedBeds: 0,
+    availableBeds: 12,
+    description: 'Modern hostel facility in Vallabh Vidyanagar (Anand) for Satwara students pursuing Higher Education, Engineering, and Pharmacy.',
+  },
+];
+
 export default function HostelsList() {
-  const [hostels, setHostels] = useState([]);
+  const [hostels, setHostels] = useState(DEFAULT_HOSTELS);
 
   useEffect(() => {
     api.get('/occupancy/summary').then((res) => {
-      if (res.data.success) setHostels(res.data.hostels);
-    });
+      if (res.data.success && res.data.hostels && res.data.hostels.length > 0) {
+        setHostels(res.data.hostels);
+      }
+    }).catch(() => {});
   }, []);
 
   return (

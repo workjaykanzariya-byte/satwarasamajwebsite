@@ -49,6 +49,11 @@ export default function AdminMahaDanManager() {
   const [importingCSV, setImportingCSV] = useState(false);
   const [importResult, setImportResult] = useState(null);
 
+  // Frontend Display Boost Settings State (Extra amount & extra donors)
+  const [extraAmount, setExtraAmount] = useState('0');
+  const [extraDonors, setExtraDonors] = useState('0');
+  const [savingDisplaySettings, setSavingDisplaySettings] = useState(false);
+
   // Download Sample CSV Template
   const handleDownloadSampleCSV = () => {
     const csvTemplate = `donorName,amount,mobile,email,certificateNo,transactionId,paymentMode,verificationStatus,message
@@ -201,12 +206,37 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
       const res = await api.get(url);
       if (res.data.success) {
         setDonations(res.data.donations || []);
-        if (res.data.stats) setStats(res.data.stats);
+        if (res.data.stats) {
+          setStats(res.data.stats);
+          setExtraAmount(String(res.data.stats.displayExtraAmount || 0));
+          setExtraDonors(String(res.data.stats.displayExtraDonors || 0));
+        }
       }
     } catch (err) {
       console.error('Failed to fetch Maha Dan donations', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveDisplaySettings = async (e) => {
+    if (e) e.preventDefault();
+    setSavingDisplaySettings(true);
+    try {
+      const res = await api.put('/mahadan/admin/display-settings', {
+        extraAmount: parseFloat(extraAmount) || 0,
+        extraDonors: parseInt(extraDonors, 10) || 0,
+      });
+      if (res.data.success) {
+        alert('Frontend display settings saved successfully! Display values are now updated on the public site.');
+        fetchDonations();
+      } else {
+        alert(res.data.message || 'Failed to save display settings.');
+      }
+    } catch (err) {
+      alert('Failed to save display settings. Please try again.');
+    } finally {
+      setSavingDisplaySettings(false);
     }
   };
 
@@ -429,19 +459,120 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
         </div>
       </div>
 
+      {/* ================= FRONTEND TOTAL DONATION & DONORS BOOST CONTROL PANEL ================= */}
+      <div className="card" style={{ padding: '24px', marginBottom: '28px', border: '2px solid #3B82F6', borderRadius: '16px', background: 'linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '18px', borderBottom: '1px solid #DBEAFE', paddingBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #1E40AF, #3B82F6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Heart size={22} color="#FFFFFF" fill="#FFFFFF" />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#1E3A8A', fontWeight: 800 }}>
+                🌐 Frontend Total Donation & Donors Display Settings
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: '#475569' }}>
+                Add extra display amounts and donor count to show higher totals on the public frontend website. Real database records remain 100% accurate.
+              </p>
+            </div>
+          </div>
+          <span style={{ fontSize: '0.8rem', background: '#DBEAFE', color: '#1E40AF', padding: '6px 14px', borderRadius: '20px', fontWeight: 'bold' }}>
+            🔒 Admin Only Setting
+          </span>
+        </div>
+
+        <form onSubmit={handleSaveDisplaySettings}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+            <div className="form-group">
+              <label style={{ fontSize: '0.88rem', fontWeight: 800, color: '#1E3A8A', display: 'block', marginBottom: '6px' }}>
+                1. Extra Display Donation Amount (₹) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                placeholder="e.g. 500000"
+                value={extraAmount}
+                onChange={(e) => setExtraAmount(e.target.value)}
+                className="form-control"
+                style={{ fontSize: '1rem', fontWeight: 'bold', borderColor: '#93C5FD' }}
+              />
+              <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '4px' }}>
+                Amount added to the real sum (₹ {stats.totalAmount.toLocaleString()})
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label style={{ fontSize: '0.88rem', fontWeight: 800, color: '#1E3A8A', display: 'block', marginBottom: '6px' }}>
+                2. Extra Display Donors Count *
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                placeholder="e.g. 150"
+                value={extraDonors}
+                onChange={(e) => setExtraDonors(e.target.value)}
+                className="form-control"
+                style={{ fontSize: '1rem', fontWeight: 'bold', borderColor: '#93C5FD' }}
+              />
+              <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '4px' }}>
+                Donors count added to real total ({stats.totalDonors} Donors)
+              </div>
+            </div>
+          </div>
+
+          {/* Live Preview Strip */}
+          <div style={{ background: '#FFFFFF', border: '1.5px solid #BFDBFE', borderRadius: '12px', padding: '16px 20px', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748B', fontWeight: 'bold' }}>
+                ✨ Public Frontend Live Display Preview
+              </div>
+              <div style={{ display: 'flex', gap: '20px', marginTop: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div>
+                  <span style={{ fontSize: '0.82rem', color: '#475569' }}>Total Donation Displayed: </span>
+                  <strong style={{ fontSize: '1.35rem', color: '#166534', fontWeight: 800 }}>
+                    ₹ {(stats.totalAmount + (parseFloat(extraAmount) || 0)).toLocaleString('en-IN')}
+                  </strong>
+                </div>
+                <div style={{ borderLeft: '1px solid #CBD5E1', paddingLeft: '20px' }}>
+                  <span style={{ fontSize: '0.82rem', color: '#475569' }}>Total Donors Displayed: </span>
+                  <strong style={{ fontSize: '1.35rem', color: '#1E40AF', fontWeight: 800 }}>
+                    {(stats.totalDonors + (parseInt(extraDonors, 10) || 0)).toLocaleString('en-IN')} Donors
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={savingDisplaySettings}
+              className="btn"
+              style={{ background: 'linear-gradient(135deg, #1E40AF, #2563EB)', color: '#FFFFFF', fontWeight: 'bold', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(30, 64, 175, 0.25)' }}
+            >
+              <CheckCircle size={18} /> {savingDisplaySettings ? 'Saving Settings...' : 'Save Display Settings'}
+            </button>
+          </div>
+        </form>
+      </div>
+
       {/* Summary Metrics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '28px' }}>
         <div className="card" style={{ borderLeft: '5px solid #F59E0B', padding: '20px' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Verified Maha Dan</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary-navy)', marginTop: '4px' }}>₹ {stats.totalAmount.toLocaleString()}</div>
+          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Real Verified Maha Dan (Backend)</div>
+          <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary-navy)', marginTop: '4px' }}>₹ {stats.totalAmount.toLocaleString()}</div>
         </div>
         <div className="card" style={{ borderLeft: '5px solid #2563EB', padding: '20px' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Verified Donors</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary-navy)', marginTop: '4px' }}>{stats.totalDonors} Donors</div>
+          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Real Verified Donors (Backend)</div>
+          <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary-navy)', marginTop: '4px' }}>{stats.totalDonors} Donors</div>
+        </div>
+        <div className="card" style={{ borderLeft: '5px solid #166534', padding: '20px', background: '#F0FDF4' }}>
+          <div style={{ fontSize: '0.78rem', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Frontend Displayed Total</div>
+          <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#166534', marginTop: '4px' }}>₹ {(stats.frontendTotalAmount || stats.totalAmount).toLocaleString()}</div>
+          <div style={{ fontSize: '0.78rem', color: '#15803D', marginTop: '2px', fontWeight: 600 }}>{(stats.frontendTotalDonors || stats.totalDonors)} Donors shown publicly</div>
         </div>
         <div className="card" style={{ borderLeft: '5px solid #D97706', padding: '20px', background: stats.pendingVerifications > 0 ? '#FFFBEB' : '#FFFFFF' }}>
-          <div style={{ fontSize: '0.8rem', color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Pending Verifications</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#B45309', marginTop: '4px' }}>{stats.pendingVerifications} Pending</div>
+          <div style={{ fontSize: '0.78rem', color: '#B45309', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'bold' }}>Pending Verifications</div>
+          <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#B45309', marginTop: '4px' }}>{stats.pendingVerifications} Pending</div>
         </div>
       </div>
 
