@@ -543,6 +543,89 @@ export default function ContentManager() {
             </div>
           </div>
 
+          {/* Home Screen Dynamic Content Settings */}
+          <div className="card" style={{ marginBottom: '24px', borderLeft: '6px solid #2563EB' }}>
+            <h2 style={{ fontSize: '1.3rem', color: 'var(--primary-navy)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🏠 Home Screen Hero & Sections Content Controls
+            </h2>
+
+            <div className="form-group" style={{ marginBottom: '14px' }}>
+              <label className="form-label" style={{ fontWeight: 'bold' }}>Hero Banner Top Badge Text</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Official Community Trust Portal | Trust Reg. No. E-8499..."
+                value={settings.home_hero_badge || ''}
+                onChange={(e) => setSettings({ ...settings, home_hero_badge: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '14px' }}>
+              <label className="form-label" style={{ fontWeight: 'bold' }}>Hero Main Title Text</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="સતવારા સમાજ વિદ્યાર્થી કલ્યાણ અને છાત્રાલય પોર્ટલ"
+                value={settings.home_hero_title || ''}
+                onChange={(e) => setSettings({ ...settings, home_hero_title: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label className="form-label" style={{ fontWeight: 'bold' }}>Hero Subtitle Paragraph</label>
+              <textarea
+                className="form-control"
+                rows={2}
+                placeholder="અમદાવાદ અને આણંદ છાત્રાલય પ્રવેશ, મેરિટ લિસ્ટ..."
+                value={settings.home_hero_sub || ''}
+                onChange={(e) => setSettings({ ...settings, home_hero_sub: e.target.value })}
+              />
+            </div>
+
+            <h3 style={{ fontSize: '1.05rem', color: 'var(--primary-maroon)', marginBottom: '12px', fontWeight: 'bold' }}>
+              📊 Trust Summary Metrics Strip (5 Metric Cards)
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <label className="form-label" style={{ fontWeight: 'bold', fontSize: '0.82rem' }}>Metric 2: Service Years</label>
+                <input type="text" className="form-control" placeholder="30+ Years" value={settings.home_trust_metric2_val || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric2_val: e.target.value })} style={{ marginBottom: '6px' }} />
+                <input type="text" className="form-control" placeholder="Community Service" value={settings.home_trust_metric2_label || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric2_label: e.target.value })} />
+              </div>
+
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <label className="form-label" style={{ fontWeight: 'bold', fontSize: '0.82rem' }}>Metric 3: Students Housed</label>
+                <input type="text" className="form-control" placeholder="2,500+" value={settings.home_trust_metric3_val || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric3_val: e.target.value })} style={{ marginBottom: '6px' }} />
+                <input type="text" className="form-control" placeholder="Students Housed" value={settings.home_trust_metric3_label || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric3_label: e.target.value })} />
+              </div>
+
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <label className="form-label" style={{ fontWeight: 'bold', fontSize: '0.82rem' }}>Metric 4: Hostel Complexes</label>
+                <input type="text" className="form-control" placeholder="2 Hostels" value={settings.home_trust_metric4_val || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric4_val: e.target.value })} style={{ marginBottom: '6px' }} />
+                <input type="text" className="form-control" placeholder="Boys & Girls Complexes" value={settings.home_trust_metric4_label || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric4_label: e.target.value })} />
+              </div>
+
+              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <label className="form-label" style={{ fontWeight: 'bold', fontSize: '0.82rem' }}>Metric 5: Transparent Admission</label>
+                <input type="text" className="form-control" placeholder="100% Merit" value={settings.home_trust_metric5_val || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric5_val: e.target.value })} style={{ marginBottom: '6px' }} />
+                <input type="text" className="form-control" placeholder="Transparent Admission" value={settings.home_trust_metric5_label || ''} onChange={(e) => setSettings({ ...settings, home_trust_metric5_label: e.target.value })} />
+              </div>
+            </div>
+
+            <h3 style={{ fontSize: '1.05rem', color: 'var(--primary-navy)', marginBottom: '12px', fontWeight: 'bold' }}>
+              🏢 Hostel Section Titles
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div className="form-group">
+                <label className="form-label">Hostel Section Title</label>
+                <input type="text" className="form-control" placeholder="લાઈવ છાત્રાલય સ્થિતિ અને ખાલી પથારીઓ" value={settings.home_hostel_title || ''} onChange={(e) => setSettings({ ...settings, home_hostel_title: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Hostel Section Subtitle</label>
+                <input type="text" className="form-control" placeholder="રિયલ ટાઈમમાં અપડેટ થતી છાત્રાલય પથારીઓની ઉપલબ્ધતા..." value={settings.home_hostel_sub || ''} onChange={(e) => setSettings({ ...settings, home_hostel_sub: e.target.value })} />
+              </div>
+            </div>
+          </div>
+
           {/* Contact Details Settings */}
           <div className="card" style={{ marginBottom: '24px' }}>
             <h2 style={{ fontSize: '1.3rem', color: 'var(--primary-navy)', marginBottom: '16px' }}>

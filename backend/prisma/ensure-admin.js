@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('📦 Creating/synchronizing Prisma database tables...');
   try {
-    execSync('npx prisma db push --accept-data-loss', {
+    execSync('npx prisma db push --schema=prisma/schema.prisma --accept-data-loss', {
       stdio: 'inherit',
       env: process.env,
     });

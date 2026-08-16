@@ -151,11 +151,23 @@ export default function MahaDanPage() {
     setErrorMsg('');
 
     if (!formData.donorName.trim()) {
-      setErrorMsg('Please enter your full name.');
+      setErrorMsg('કૃપા કરીને તમારું પૂરું નામ દાખલ કરો.');
       return;
     }
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      setErrorMsg('Please select a valid donation amount.');
+
+    const cleanMobile = (formData.mobile || '').trim();
+    if (!cleanMobile) {
+      setErrorMsg('કૃપા કરીને ૧૦ અંકનો મોબાઈલ નંબર દાખલ કરો.');
+      return;
+    }
+    if (cleanMobile.length !== 10 || !/^\d{10}$/.test(cleanMobile)) {
+      setErrorMsg('મોબાઈલ નંબર બરાબર 10 અંકનો જ હોવો જોઈએ (દા.ત. 9876543210).');
+      return;
+    }
+
+    const parsedAmt = parseFloat(formData.amount);
+    if (!formData.amount || isNaN(parsedAmt) || parsedAmt < 500) {
+      setErrorMsg('દાનની રકમ ઓછામાં ઓછી ₹500 હોવી જોઈએ.');
       return;
     }
 
@@ -277,8 +289,23 @@ export default function MahaDanPage() {
     <div style={{ background: '#fdfbf7', minHeight: '100vh', paddingBottom: '70px' }}>
       
       {/* Hero Banner Header */}
-      <section style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)', color: '#ffffff', padding: '56px 0', borderBottom: '4px solid #F59E0B', position: 'relative' }}>
+      <section style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)', color: '#ffffff', padding: '48px 0', borderBottom: '4px solid #F59E0B', position: 'relative' }}>
         <div className="container" style={{ textAlign: 'center' }}>
+          {/* 35 Years Gaurav Yatra Official Logo Badge */}
+          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+            <img
+              src="/35_years_logo.png"
+              alt="Satwara Samaj 35 Years Gaurav Yatra Logo"
+              style={{
+                height: '140px',
+                maxHeight: '160px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 8px 25px rgba(0,0,0,0.5))',
+                transition: 'transform 0.3s ease',
+              }}
+            />
+          </div>
+
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245, 158, 11, 0.25)', color: '#FFD700', border: '1px solid #F59E0B', borderRadius: '30px', padding: '6px 20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '14px' }}>
             <Sparkles size={16} color="#FFD700" /> સમસ્ત સતવારા મહામંડળ આયોજન
           </div>
@@ -418,7 +445,7 @@ export default function MahaDanPage() {
                 {/* Right Column: Donation Form */}
                 <div className="card" style={{ padding: '32px' }}>
                   <h3 className="heading-serif" style={{ color: 'var(--primary-maroon)', fontSize: '1.35rem', marginTop: 0, marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #F1F5F9' }}>
-                    દાનની રકમ પસંદ કરો અથવા કસ્ટમ રકમ ઉમેરો
+                    દાનની વિગતો દાખલ કરો
                   </h3>
 
                   {errorMsg && (
@@ -428,34 +455,41 @@ export default function MahaDanPage() {
                   )}
 
                   <form onSubmit={handleInitiatePayment}>
-                    <div style={{ marginBottom: '24px' }}>
-                      <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#1E293B', marginBottom: '10px' }}>
-                        દાનની રકમ પસંદ કરો (₹)
+                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 'bold', color: '#1E293B', marginBottom: '6px' }}>
+                        દાનની રકમ (ઓછામાં ઓછા ₹500) *
                       </label>
-                      <div className="public-mahadan-amount-grid">
-                        {predefinedAmounts.map((amt) => {
-                          const isSelected = formData.amount === amt.toString();
-                          return (
-                            <button
-                              key={amt}
-                              type="button"
-                              onClick={() => handleAmountSelect(amt)}
-                              style={{
-                                padding: '12px',
-                                borderRadius: '10px',
-                                border: isSelected ? '2px solid #F59E0B' : '1px solid #CBD5E1',
-                                background: isSelected ? 'linear-gradient(135deg, #0F172A, #1E293B)' : '#F8FAFC',
-                                color: isSelected ? '#FFD700' : '#1E293B',
-                                fontWeight: 'bold',
-                                fontSize: '1rem',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              ₹ {amt.toLocaleString()}
-                            </button>
-                          );
-                        })}
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ position: 'absolute', left: '14px', fontWeight: 800, color: 'var(--primary-maroon)', fontSize: '1.1rem' }}>₹</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          name="amount"
+                          placeholder="દાનની રકમ લખો (દા.ત. 500, 1000, 2500)"
+                          value={formData.amount}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setFormData((prev) => ({ ...prev, amount: val }));
+                          }}
+                          className="form-control"
+                          style={{
+                            paddingLeft: '36px',
+                            fontSize: '1.05rem',
+                            fontWeight: 'bold',
+                            color: '#0F172A',
+                            borderColor: formData.amount && parseFloat(formData.amount) < 500 ? '#DC2626' : undefined,
+                          }}
+                        />
                       </div>
+                      {formData.amount && parseFloat(formData.amount) < 500 ? (
+                        <small style={{ color: '#DC2626', fontSize: '0.82rem', marginTop: '4px', fontWeight: 'bold', display: 'block' }}>
+                          ⚠️ દાનની રકમ ઓછામાં ઓછી ₹500 હોવી જોઈએ.
+                        </small>
+                      ) : (
+                        <small style={{ color: '#64748B', fontSize: '0.78rem', marginTop: '4px', display: 'block' }}>
+                          તમે ₹500 અથવા તેનાથી વધુ કોઈપણ રકમ અહી દાખલ કરી શકો છો.
+                        </small>
+                      )}
                     </div>
 
                     <div className="form-group" style={{ marginBottom: '16px' }}>
@@ -475,15 +509,34 @@ export default function MahaDanPage() {
 
                     <div className="public-mahadan-input-grid">
                       <div className="form-group">
-                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>મોબાઈલ નંબર</label>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>
+                          મોબાઈલ નંબર (૧૦ અંક) *
+                        </label>
                         <input
                           type="tel"
                           name="mobile"
+                          required
+                          maxLength={10}
                           placeholder="દા.ત. 9876543210"
                           value={formData.mobile}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            const numsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+                            setFormData((prev) => ({ ...prev, mobile: numsOnly }));
+                          }}
                           className="form-control"
+                          style={{
+                            borderColor: formData.mobile && formData.mobile.length !== 10 ? '#DC2626' : undefined,
+                          }}
                         />
+                        {formData.mobile && formData.mobile.length !== 10 ? (
+                          <small style={{ color: '#DC2626', fontSize: '0.82rem', marginTop: '4px', fontWeight: 'bold', display: 'block' }}>
+                            ⚠️ મોબાઈલ નંબર બરાબર 10 અંકનો હોવો જોઈએ ({formData.mobile.length}/10 અંક).
+                          </small>
+                        ) : formData.mobile && formData.mobile.length === 10 ? (
+                          <small style={{ color: '#16A34A', fontSize: '0.82rem', marginTop: '4px', fontWeight: 'bold', display: 'block' }}>
+                            ✓ 10 અંકનો માન્ય મોબાઈલ નંબર
+                          </small>
+                        ) : null}
                       </div>
                       <div className="form-group">
                         <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>ઈમેઈલ સરનામું</label>

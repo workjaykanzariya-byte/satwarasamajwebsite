@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import VisualOccupancyGrid from '../../components/admin/VisualOccupancyGrid';
-import { Building2, Search, Plus, Layers, BedDouble, RefreshCw, X, MapPin } from 'lucide-react';
+import { Building2, Search, Plus, Layers, BedDouble, RefreshCw, X, MapPin, Edit3 } from 'lucide-react';
 
 export default function OccupancyManager() {
   const [hostels, setHostels] = useState([]);
@@ -17,6 +17,8 @@ export default function OccupancyManager() {
   // Dynamic Structure Forms
   const [showAddFloorModal, setShowAddFloorModal] = useState(false);
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
+  const [showEditHostelModal, setShowEditHostelModal] = useState(false);
+
   const [newFloorName, setNewFloorName] = useState('');
   const [newFloorNum, setNewFloorNum] = useState('');
 
@@ -24,6 +26,19 @@ export default function OccupancyManager() {
   const [newRoomNum, setNewRoomNum] = useState('');
   const [newRoomType, setNewRoomType] = useState('DOUBLE');
   const [newBedCount, setNewBedCount] = useState(2);
+
+  // Edit Hostel Form State
+  const [editHostelForm, setEditHostelForm] = useState({
+    id: '',
+    name: '',
+    wardenName: '',
+    wardenContact: '',
+    wardenEmail: '',
+    totalCapacity: 30,
+    city: '',
+    address: '',
+    description: '',
+  });
 
   useEffect(() => {
     fetchHostels();
@@ -133,6 +148,36 @@ export default function OccupancyManager() {
     }
   };
 
+  const handleOpenEditHostelModal = (h) => {
+    if (!h) return;
+    setEditHostelForm({
+      id: h.id,
+      name: h.name || '',
+      wardenName: h.wardenName || '',
+      wardenContact: h.wardenContact || '',
+      wardenEmail: h.wardenEmail || '',
+      totalCapacity: h.totalCapacity || 30,
+      city: h.city || '',
+      address: h.address || '',
+      description: h.description || '',
+    });
+    setShowEditHostelModal(true);
+  };
+
+  const handleSaveHostelDetails = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.put(`/occupancy/hostels/${editHostelForm.id}`, editHostelForm);
+      if (res.data.success) {
+        alert('Hostel profile details updated successfully!');
+        setShowEditHostelModal(false);
+        fetchHostels();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update hostel details.');
+    }
+  };
+
   const activeHostel = hostels.find((h) => h.id === parseInt(selectedHostelId, 10));
 
   return (
@@ -149,7 +194,12 @@ export default function OccupancyManager() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          {activeHostel && (
+            <button className="btn btn-outline" onClick={() => handleOpenEditHostelModal(activeHostel)} style={{ borderColor: 'var(--primary-maroon)', color: 'var(--primary-maroon)', fontWeight: 'bold' }}>
+              <Edit3 size={16} /> Edit Selected Hostel Profile
+            </button>
+          )}
           <button className="btn btn-outline" onClick={() => setShowAddFloorModal(true)}>
             <Layers size={16} /> Add Floor
           </button>
@@ -301,6 +351,126 @@ export default function OccupancyManager() {
               <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
                 Create Room & Generate Beds
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT HOSTEL DETAILS MODAL */}
+      {showEditHostelModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '650px', padding: '30px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-navy)', margin: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Edit3 size={20} color="var(--primary-maroon)" /> Edit Hostel Profile & Warden Details
+              </h3>
+              <button onClick={() => setShowEditHostelModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveHostelDetails}>
+              <div className="form-group" style={{ marginBottom: '14px' }}>
+                <label className="form-label" style={{ fontWeight: 'bold' }}>Hostel Name *</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={editHostelForm.name}
+                  onChange={(e) => setEditHostelForm({ ...editHostelForm, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 'bold' }}>Warden Name *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="e.g. Rameshbhai Satvara"
+                    value={editHostelForm.wardenName}
+                    onChange={(e) => setEditHostelForm({ ...editHostelForm, wardenName: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 'bold' }}>Warden Contact Phone *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="e.g. +91 98250 12345"
+                    value={editHostelForm.wardenContact}
+                    onChange={(e) => setEditHostelForm({ ...editHostelForm, wardenContact: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 'bold' }}>Warden Email</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="warden@satvaramahamandal.org"
+                    value={editHostelForm.wardenEmail}
+                    onChange={(e) => setEditHostelForm({ ...editHostelForm, wardenEmail: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ fontWeight: 'bold' }}>Total Capacity (Beds) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-control"
+                    value={editHostelForm.totalCapacity}
+                    onChange={(e) => setEditHostelForm({ ...editHostelForm, totalCapacity: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '14px' }}>
+                <label className="form-label" style={{ fontWeight: 'bold' }}>City / Campus Location</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. Ahmedabad / Anand"
+                  value={editHostelForm.city}
+                  onChange={(e) => setEditHostelForm({ ...editHostelForm, city: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '14px' }}>
+                <label className="form-label" style={{ fontWeight: 'bold' }}>Full Hostel Address</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={editHostelForm.address}
+                  onChange={(e) => setEditHostelForm({ ...editHostelForm, address: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label" style={{ fontWeight: 'bold' }}>Hostel Description / Overview</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={editHostelForm.description}
+                  onChange={(e) => setEditHostelForm({ ...editHostelForm, description: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowEditHostelModal(false)} style={{ flex: 1 }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                  Save Hostel Profile Changes
+                </button>
+              </div>
             </form>
           </div>
         </div>

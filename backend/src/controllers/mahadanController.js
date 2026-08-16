@@ -64,12 +64,19 @@ const submitQRPayment = async (req, res, next) => {
       });
     }
 
-    const donorMobile = mobile && mobile.trim() ? mobile.trim() : 'N/A';
-    const parsedAmount = parseFloat(amount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+    const donorMobile = mobile && mobile.trim() ? mobile.trim() : '';
+    if (!donorMobile || donorMobile.length !== 10 || !/^\d{10}$/.test(donorMobile)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid donation amount.',
+        message: 'Mobile number must be exactly 10 digits (મોબાઈલ નંબર ૧૦ અંકનો હોવો જોઈએ).',
+      });
+    }
+
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount < 500) {
+      return res.status(400).json({
+        success: false,
+        message: 'Minimum donation amount must be ₹500 (દાનની રકમ ઓછામાં ઓછી ₹500 હોવી જોઈએ).',
       });
     }
 

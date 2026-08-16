@@ -749,12 +749,49 @@ const deleteRoom = async (req, res, next) => {
     next(error);
   }
 };
+const updateHostelDetails = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, wardenName, wardenContact, wardenEmail, totalCapacity, address, city, description } = req.body;
+
+    const hostel = await prisma.hostel.findUnique({
+      where: { id: parseInt(id, 10) },
+    });
+
+    if (!hostel) {
+      return res.status(404).json({ success: false, message: 'Hostel record not found.' });
+    }
+
+    const updated = await prisma.hostel.update({
+      where: { id: hostel.id },
+      data: {
+        ...(name !== undefined && { name: name.trim() }),
+        ...(wardenName !== undefined && { wardenName: wardenName.trim() }),
+        ...(wardenContact !== undefined && { wardenContact: wardenContact.trim() }),
+        ...(wardenEmail !== undefined && { wardenEmail: wardenEmail.trim() }),
+        ...(totalCapacity !== undefined && { totalCapacity: isNaN(parseInt(totalCapacity, 10)) ? 0 : Math.max(0, parseInt(totalCapacity, 10)) }),
+        ...(address !== undefined && { address: address.trim() }),
+        ...(city !== undefined && { city: city.trim() }),
+        ...(description !== undefined && { description: description.trim() }),
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: 'Hostel profile & contact details updated successfully!',
+      hostel: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getHostelsSummary,
   getHostelHierarchy,
   getVisualOccupancyGrid,
   createHostel,
+  updateHostelDetails,
   addFloor,
   addRoom,
   addBed,

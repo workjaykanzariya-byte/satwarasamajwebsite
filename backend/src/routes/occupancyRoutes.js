@@ -4,6 +4,7 @@ const {
   getHostelHierarchy,
   getVisualOccupancyGrid,
   createHostel,
+  updateHostelDetails,
   addFloor,
   addRoom,
   addBed,
@@ -30,6 +31,7 @@ router.get('/vacant-beds', authenticateAdmin, getVacantBeds);
 
 // Dynamic Structure Management Actions
 router.post('/hostels', authenticateAdmin, authorizeRoles('SUPER_ADMIN', 'HOSTEL_MANAGER'), createHostel);
+router.put('/hostels/:id', authenticateAdmin, authorizeRoles('SUPER_ADMIN', 'HOSTEL_MANAGER'), updateHostelDetails);
 router.post('/floors', authenticateAdmin, authorizeRoles('SUPER_ADMIN', 'HOSTEL_MANAGER'), addFloor);
 router.delete('/floors/:floorId', authenticateAdmin, authorizeRoles('SUPER_ADMIN', 'HOSTEL_MANAGER'), deleteFloor);
 router.post('/rooms', authenticateAdmin, authorizeRoles('SUPER_ADMIN', 'HOSTEL_MANAGER'), addRoom);

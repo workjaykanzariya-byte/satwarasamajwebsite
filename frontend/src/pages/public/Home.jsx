@@ -51,6 +51,7 @@ export default function Home() {
   const [hostels, setHostels] = useState(DEFAULT_HOSTELS);
   const [news, setNews] = useState([]);
   const [mahadanStats, setMahadanStats] = useState({ totalAmount: 0, totalDonors: 0 });
+  const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,10 +60,11 @@ export default function Home() {
 
   const fetchHomeData = async () => {
     try {
-      const [hostelRes, newsRes, mahadanRes] = await Promise.all([
+      const [hostelRes, newsRes, mahadanRes, settingsRes] = await Promise.all([
         api.get('/occupancy/summary').catch(() => null),
         api.get('/cms/news').catch(() => null),
         api.get('/mahadan/public-stats').catch(() => null),
+        api.get('/cms/settings').catch(() => null),
       ]);
 
       if (hostelRes && hostelRes.data && hostelRes.data.success && hostelRes.data.hostels && hostelRes.data.hostels.length > 0) {
@@ -73,6 +75,9 @@ export default function Home() {
       }
       if (mahadanRes && mahadanRes.data && mahadanRes.data.success && mahadanRes.data.stats) {
         setMahadanStats(mahadanRes.data.stats);
+      }
+      if (settingsRes && settingsRes.data && settingsRes.data.success && settingsRes.data.settings) {
+        setSettings(settingsRes.data.settings);
       }
     } catch (err) {
       console.error('Home data load error:', err);
@@ -88,13 +93,13 @@ export default function Home() {
         <div className="container">
           <div style={{ maxWidth: '850px' }}>
             <div className="home-hero-badge">
-              <ShieldCheck size={15} /> Official Community Trust Portal | {t('trust_reg')}
+              <ShieldCheck size={15} /> {settings.home_hero_badge || `Official Community Trust Portal | ${t('trust_reg')}`}
             </div>
             <h1 className="heading-serif home-hero-title">
-              {t('hero_title')}
+              {settings.home_hero_title || t('hero_title')}
             </h1>
             <p className="home-hero-sub">
-              {t('hero_subtitle')}
+              {settings.home_hero_sub || t('hero_subtitle')}
             </p>
 
             <div className="home-hero-btn-group">
@@ -119,10 +124,10 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="home-mahadan-counter-badge">
-                    ✨ SATWARA MAHA DAN COUNTER
+                    {settings.home_mahadan_badge || '✨ SATWARA MAHA DAN COUNTER'}
                   </div>
                   <div className="home-mahadan-counter-sub">
-                    Live Community Contributions
+                    {settings.home_mahadan_sub || 'Live Community Contributions'}
                   </div>
                 </div>
               </div>
@@ -175,8 +180,8 @@ export default function Home() {
                 <Award size={22} />
               </div>
               <div>
-                <div className="trust-summary-val">30+ Years</div>
-                <div className="trust-summary-label">Community Service</div>
+                <div className="trust-summary-val">{settings.home_trust_metric2_val || '30+ Years'}</div>
+                <div className="trust-summary-label">{settings.home_trust_metric2_label || 'Community Service'}</div>
               </div>
             </div>
 
@@ -185,8 +190,8 @@ export default function Home() {
                 <Users size={22} />
               </div>
               <div>
-                <div className="trust-summary-val">2,500+</div>
-                <div className="trust-summary-label">Students Housed</div>
+                <div className="trust-summary-val">{settings.home_trust_metric3_val || '2,500+'}</div>
+                <div className="trust-summary-label">{settings.home_trust_metric3_label || 'Students Housed'}</div>
               </div>
             </div>
 
@@ -195,8 +200,8 @@ export default function Home() {
                 <Building2 size={22} />
               </div>
               <div>
-                <div className="trust-summary-val">2 Hostels</div>
-                <div className="trust-summary-label">Boys & Girls Complexes</div>
+                <div className="trust-summary-val">{settings.home_trust_metric4_val || '2 Hostels'}</div>
+                <div className="trust-summary-label">{settings.home_trust_metric4_label || 'Boys & Girls Complexes'}</div>
               </div>
             </div>
 
@@ -205,8 +210,8 @@ export default function Home() {
                 <BookOpen size={22} />
               </div>
               <div>
-                <div className="trust-summary-val">100% Merit</div>
-                <div className="trust-summary-label">Transparent Admission</div>
+                <div className="trust-summary-val">{settings.home_trust_metric5_val || '100% Merit'}</div>
+                <div className="trust-summary-label">{settings.home_trust_metric5_label || 'Transparent Admission'}</div>
               </div>
             </div>
           </div>
@@ -218,14 +223,14 @@ export default function Home() {
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 40px auto' }}>
             <h2 className="heading-serif" style={{ fontSize: '2rem', color: 'var(--primary-maroon)', marginBottom: '10px' }}>
-              {t('hostel_status_title')}
+              {settings.home_hostel_title || t('hostel_status_title')}
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem' }}>
-              {t('hostel_status_sub')}
+              {settings.home_hostel_sub || t('hostel_status_sub')}
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
+          <div className="home-hostel-grid">
             {hostels.map((hostel) => (
               <div key={hostel.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
@@ -281,39 +286,39 @@ export default function Home() {
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2 className="heading-serif" style={{ fontSize: '1.8rem', color: 'var(--primary-navy)' }}>
-              {t('journey_title')}
+              {settings.home_journey_title || t('journey_title')}
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+          <div className="home-timeline-grid">
             <div className="card" style={{ textAlign: 'center', background: '#f8fafc', padding: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary-maroon)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, margin: '0 auto 10px auto' }}>1</div>
-              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>Online Application</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Fill details & preference on site</p>
+              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step1_title || 'Online Application'}</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step1_sub || 'Fill details & preference on site'}</p>
             </div>
 
             <div className="card" style={{ textAlign: 'center', background: '#f8fafc', padding: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary-maroon)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, margin: '0 auto 10px auto' }}>2</div>
-              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>Doc Upload & OTP</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Upload marksheets & mobile verify</p>
+              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step2_title || 'Doc Upload & OTP'}</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step2_sub || 'Upload marksheets & mobile verify'}</p>
             </div>
 
             <div className="card" style={{ textAlign: 'center', background: '#f8fafc', padding: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary-maroon)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, margin: '0 auto 10px auto' }}>3</div>
-              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>Merit List Publication</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Auto-calculated merit rank release</p>
+              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step3_title || 'Merit List Publication'}</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step3_sub || 'Auto-calculated merit rank release'}</p>
             </div>
 
             <div className="card" style={{ textAlign: 'center', background: '#f8fafc', padding: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary-maroon)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, margin: '0 auto 10px auto' }}>4</div>
-              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>Bed Allotment</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Admin assigns room & bed number</p>
+              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step4_title || 'Bed Allotment'}</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step4_sub || 'Admin assigns room & bed number'}</p>
             </div>
 
             <div className="card" style={{ textAlign: 'center', background: '#f8fafc', padding: '16px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary-maroon)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, margin: '0 auto 10px auto' }}>5</div>
-              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>Hostel Joining</h4>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Fee confirmation & room check-in</p>
+              <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step5_title || 'Hostel Joining'}</h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step5_sub || 'Fee confirmation & room check-in'}</p>
             </div>
           </div>
         </div>
@@ -325,9 +330,9 @@ export default function Home() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
             <div>
               <h2 className="heading-serif" style={{ fontSize: '1.8rem', color: 'var(--primary-maroon)' }}>
-                {t('news_section_title')}
+                {settings.home_news_title || t('news_section_title')}
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>{t('news_section_sub')}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>{settings.home_news_sub || t('news_section_sub')}</p>
             </div>
             <Link to="/news" className="btn btn-outline btn-sm">View All News</Link>
           </div>

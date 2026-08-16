@@ -30,8 +30,8 @@ export default function AdminLogin() {
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
       <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '40px', borderTop: '6px solid var(--primary-maroon)' }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-maroon), var(--accent-gold))', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
-            <Shield size={32} />
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+            <img src="/35_years_logo.png" alt="35 Years Gaurav Yatra Logo" style={{ height: '80px', objectFit: 'contain' }} />
           </div>
           <h2 className="heading-serif" style={{ fontSize: '1.8rem', color: 'var(--primary-navy)' }}>
             Admin Portal Login
