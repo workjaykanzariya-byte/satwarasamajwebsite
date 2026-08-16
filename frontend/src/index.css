@@ -1324,5 +1324,18 @@ img, video, iframe {
   }
 }
 
+.home-upcoming-grid {
+  display: grid !important;
+  grid-template-columns: 1.1fr 1fr !important;
+  gap: 32px !important;
+}
+
+@media (max-width: 900px) {
+  .home-upcoming-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
+
 
 

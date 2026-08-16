@@ -614,7 +614,7 @@ export default function ContentManager() {
             <h3 style={{ fontSize: '1.05rem', color: 'var(--primary-navy)', marginBottom: '12px', fontWeight: 'bold' }}>
               🏢 Hostel Section Titles
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
               <div className="form-group">
                 <label className="form-label">Hostel Section Title</label>
                 <input type="text" className="form-control" placeholder="લાઈવ છાત્રાલય સ્થિતિ અને ખાલી પથારીઓ" value={settings.home_hostel_title || ''} onChange={(e) => setSettings({ ...settings, home_hostel_title: e.target.value })} />
@@ -622,6 +622,35 @@ export default function ContentManager() {
               <div className="form-group">
                 <label className="form-label">Hostel Section Subtitle</label>
                 <input type="text" className="form-control" placeholder="રિયલ ટાઈમમાં અપડેટ થતી છાત્રાલય પથારીઓની ઉપલબ્ધતા..." value={settings.home_hostel_sub || ''} onChange={(e) => setSettings({ ...settings, home_hostel_sub: e.target.value })} />
+              </div>
+            </div>
+
+            <h3 style={{ fontSize: '1.05rem', color: '#B45309', marginBottom: '12px', fontWeight: 'bold' }}>
+              ✨ Upcoming Girls Hostel & Naming Donor (નામકરણ દાતા) Settings
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+              <div className="form-group">
+                <label className="form-label">Project Section Title</label>
+                <input type="text" className="form-control" placeholder="🎓 આધુનિક કન્યા છાત્રાલય સંકુલ" value={settings.home_new_girls_hostel_title || ''} onChange={(e) => setSettings({ ...settings, home_new_girls_hostel_title: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Project Subtitle</label>
+                <input type="text" className="form-control" placeholder="સતવારા સમાજ દીકરીઓના ઉજ્જવળ ભવિષ્ય..." value={settings.home_new_girls_hostel_sub || ''} onChange={(e) => setSettings({ ...settings, home_new_girls_hostel_sub: e.target.value })} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+              <div className="form-group">
+                <label className="form-label">Naming Donor Name (મુખ્ય નામકરણ દાતા)</label>
+                <input type="text" className="form-control" placeholder="શ્રીમતી ગૌરીબેન તથા નરેશભાઈ કરશનભાઈ કણઝરીયા" value={settings.home_donor_name || ''} onChange={(e) => setSettings({ ...settings, home_donor_name: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Donor Native Place (મૂળ વતન)</label>
+                <input type="text" className="form-control" placeholder="(મૂળ વતણ - જાળીલા, તા. રાણપુર, જી. બોટાદ)" value={settings.home_donor_native || ''} onChange={(e) => setSettings({ ...settings, home_donor_native: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Donor Current Residence (હાલ રહેઠાણ)</label>
+                <input type="text" className="form-control" placeholder="(હાલ - સતવારા સોસાયટી, ધંધુકા)" value={settings.home_donor_current || ''} onChange={(e) => setSettings({ ...settings, home_donor_current: e.target.value })} />
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
-import { Building2, Award, Users, BookOpen, Calendar, CheckCircle2, ArrowRight, ShieldCheck, PhoneCall, Heart } from 'lucide-react';
+import { Building2, Award, Users, BookOpen, Calendar, CheckCircle2, ArrowRight, ShieldCheck, PhoneCall, Heart, Sparkles } from 'lucide-react';
 
 const DEFAULT_HOSTELS = [
   {
@@ -278,6 +278,131 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* UPCOMING MODERN GIRLS HOSTEL PROJECT SECTION */}
+      <section style={{ background: 'linear-gradient(135deg, #FDFBF7 0%, #FFFBEB 50%, #FEF3C7 100%)', padding: '64px 0', borderTop: '2px solid #FCD34D', borderBottom: '2px solid #FCD34D', position: 'relative', overflow: 'hidden' }}>
+        <div className="container">
+          
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 40px auto' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(217, 119, 6, 0.15)', color: '#B45309', border: '1px solid #F59E0B', borderRadius: '30px', padding: '6px 20px', fontSize: '0.85rem', fontWeight: 800, marginBottom: '14px', letterSpacing: '0.5px' }}>
+              <Sparkles size={16} color="#D97706" /> આકાર લઈ રહ્યું છે નવું કન્યા છાત્રાલય (UPCOMING PROJECT)
+            </div>
+            <h2 className="heading-serif" style={{ fontSize: '2.2rem', color: 'var(--primary-navy)', marginBottom: '12px', fontWeight: 800 }}>
+              {settings.home_new_girls_hostel_title || '🎓 આધુનિક કન્યા છાત્રાલય સંકુલ'}
+            </h2>
+            <p style={{ color: '#475569', fontSize: '1rem', lineHeight: '1.65' }}>
+              {settings.home_new_girls_hostel_sub || 'સતવારા સમાજ દીકરીઓના ઉજ્જવળ ભવિષ્ય અને ઉચ્ચ શિક્ષણ માટે આધુનિક સુવિધાઓથી સજ્જ સુરક્ષિત કન્યા છાત્રાલય.'}
+            </p>
+          </div>
+
+          {/* Interactive 2-Column Content Grid */}
+          <div className="home-upcoming-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '32px', alignItems: 'center' }}>
+            
+            {/* Left Column: 3D Architectural Render Card with Floating Badges */}
+            <div style={{ position: 'relative' }}>
+              <div className="card" style={{ padding: '12px', background: '#FFFFFF', borderRadius: '20px', boxShadow: '0 20px 45px rgba(180, 83, 9, 0.15)', border: '2px solid #FCD34D', overflow: 'hidden' }}>
+                
+                {/* 3D Render Image */}
+                <div style={{ borderRadius: '14px', overflow: 'hidden', position: 'relative', height: '360px' }}>
+                  <img
+                    src="/new_girls_hostel_render.jpg"
+                    alt="Upcoming Modern Girls Hostel 3D Architectural Render"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  
+                  {/* Status Overlay Pill */}
+                  <div style={{ position: 'absolute', top: '16px', left: '16px', background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(10px)', color: '#FFD700', border: '1px solid #F59E0B', borderRadius: '30px', padding: '8px 18px', fontSize: '0.84rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }}></span>
+                    આકાર લઈ રહેલું સંકુલ (Under Construction)
+                  </div>
+
+                  {/* Architecture Feature Tag */}
+                  <div style={{ position: 'absolute', bottom: '16px', right: '16px', background: 'linear-gradient(135deg, var(--primary-maroon), #991B1B)', color: '#FFFFFF', borderRadius: '12px', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 800, boxShadow: '0 6px 18px rgba(0,0,0,0.3)' }}>
+                    🏢 4-Story Ultra Modern Facility
+                  </div>
+                </div>
+
+                {/* Quick Specs Bar under image */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '12px', textAlign: 'center', background: '#FFFBEB', padding: '12px', borderRadius: '12px', border: '1px solid #FDE68A' }}>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#B45309', fontWeight: 700, textTransform: 'uppercase' }}>કુલ ક્ષમતા</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--primary-navy)' }}>100+ દીકરીઓ</div>
+                  </div>
+                  <div style={{ borderLeft: '1px solid #FCD34D', borderRight: '1px solid #FCD34D' }}>
+                    <div style={{ fontSize: '0.74rem', color: '#B45309', fontWeight: 700, textTransform: 'uppercase' }}>બિલ્ડીંગ માળ</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--primary-navy)' }}>4 માળ સંકુલ</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.74rem', color: '#B45309', fontWeight: 700, textTransform: 'uppercase' }}>સુરક્ષા દરજ્જો</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#15803D' }}>24/7 CCTV</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Right Column: Features Checklist + Naming Donor Card */}
+            <div>
+              {/* Features List */}
+              <div style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '1.3rem', color: 'var(--primary-maroon)', marginBottom: '16px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Building2 size={22} color="var(--primary-maroon)" /> આધુનિક કન્યા છાત્રાલય મુખ્ય આકર્ષણો:
+                </h3>
+
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> સુરક્ષિત અને આધુનિક કેમ્પસ
+                  </li>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> વિશાળ અને સુસજ્જ રૂમ
+                  </li>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> Wi-Fi અને Study Hall
+                  </li>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> CCTV સુરક્ષા વ્યવસ્થા
+                  </li>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> શુદ્ધ ભોજન અને રહેઠાણ
+                  </li>
+                  <li style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FCD34D', fontSize: '0.88rem', fontWeight: 800, color: '#1E293B', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <CheckCircle2 size={18} color="#15803D" style={{ flexShrink: 0 }} /> સર્વાંગી વિકાસ વાતાવરણ
+                  </li>
+                </ul>
+              </div>
+
+              {/* Naming Donor Card (નામકરણ દાતા) */}
+              <div className="card" style={{ background: '#FFFFFF', border: '1px solid #FCD34D', borderLeft: '6px solid #DC2626', borderRadius: '16px', padding: '20px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#B45309', fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                  <Award size={18} color="#B45309" /> ☀️ મુખ્ય નામકરણ દાતા
+                </div>
+                
+                <h4 style={{ fontSize: '1.2rem', color: 'var(--primary-navy)', fontWeight: 800, margin: '0 0 8px 0', lineHeight: '1.3' }}>
+                  {settings.home_donor_name || 'શ્રીમતી ગૌરીબેન તથા નરેશભાઈ કરશનભાઈ કણઝરીયા'}
+                </h4>
+
+                <div style={{ fontSize: '0.88rem', color: '#475569', marginBottom: '4px', fontWeight: 600 }}>
+                  📍 {settings.home_donor_native || '(મૂળ વતણ - જાળીલા, તા. રાણપુર, જી. બોટાદ)'}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
+                  🏠 {settings.home_donor_current || '(હાલ - સતવારા સોસાયટી, ધંધુકા)'}
+                </div>
+              </div>
+
+              {/* Call to Action Button */}
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                <Link to="/mahadan" className="btn btn-primary btn-lg" style={{ flex: 1, padding: '14px 22px', fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 6px 20px rgba(153, 27, 27, 0.25)' }}>
+                  <Heart fill="#FFD700" color="#FFD700" size={20} /> કન્યા છાત્રાલય માટે મહા દાન અર્પણ કરો <ArrowRight size={18} />
+                </Link>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
       </section>
 
