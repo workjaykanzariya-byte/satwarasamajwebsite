@@ -631,7 +631,7 @@ export default function ContentManager() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
               <div className="form-group">
                 <label className="form-label">Project Section Title</label>
-                <input type="text" className="form-control" placeholder="🎓 આધુનિક કન્યા છાત્રાલય સંકુલ" value={settings.home_new_girls_hostel_title || ''} onChange={(e) => setSettings({ ...settings, home_new_girls_hostel_title: e.target.value })} />
+                <input type="text" className="form-control" placeholder="🎓 તખુબા કન્યા છાત્રાલય સંકુલ" value={settings.home_new_girls_hostel_title || ''} onChange={(e) => setSettings({ ...settings, home_new_girls_hostel_title: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Project Subtitle</label>
@@ -639,14 +639,21 @@ export default function ContentManager() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
               <div className="form-group">
                 <label className="form-label">Naming Donor Name (મુખ્ય નામકરણ દાતા)</label>
                 <input type="text" className="form-control" placeholder="શ્રીમતી ગૌરીબેન તથા નરેશભાઈ કરશનભાઈ કણઝરીયા" value={settings.home_donor_name || ''} onChange={(e) => setSettings({ ...settings, home_donor_name: e.target.value })} />
               </div>
               <div className="form-group">
+                <label className="form-label">Donation Amount (દાન રકમ)</label>
+                <input type="text" className="form-control" placeholder="₹૧,૦૦,૧૧,૧૧૧/-" value={settings.home_donor_amount || ''} onChange={(e) => setSettings({ ...settings, home_donor_amount: e.target.value })} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div className="form-group">
                 <label className="form-label">Donor Native Place (મૂળ વતન)</label>
-                <input type="text" className="form-control" placeholder="(મૂળ વતણ - જાળીલા, તા. રાણપુર, જી. બોટાદ)" value={settings.home_donor_native || ''} onChange={(e) => setSettings({ ...settings, home_donor_native: e.target.value })} />
+                <input type="text" className="form-control" placeholder="(મૂળ વતન - જાળીલા, તા. રાણપુર, જી. બોટાદ)" value={settings.home_donor_native || ''} onChange={(e) => setSettings({ ...settings, home_donor_native: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Donor Current Residence (હાલ રહેઠાણ)</label>

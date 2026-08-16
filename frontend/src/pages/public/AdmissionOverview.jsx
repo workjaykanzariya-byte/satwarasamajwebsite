@@ -125,8 +125,8 @@ export default function AdmissionOverview() {
                   Apply for {h.name}
                 </Link>
               ) : (
-                <button className="btn btn-outline" disabled style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed' }}>
-                  Admissions Closed for {h.name}
+                <button className="btn btn-outline" disabled style={{ width: '100%', opacity: 0.7, cursor: 'not-allowed', padding: '10px 14px', whiteSpace: 'normal', height: 'auto', fontWeight: 'bold' }}>
+                  🔒 Admissions Closed
                 </button>
               )}
             </div>
