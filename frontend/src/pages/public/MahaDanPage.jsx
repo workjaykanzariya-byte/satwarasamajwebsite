@@ -248,7 +248,7 @@ export default function MahaDanPage() {
   // Share on WhatsApp
   const shareWhatsApp = () => {
     if (!trackedDonation) return;
-    const text = `🙏 *Samast Satwara Mahamandal - Ahmedabad* 🙏\n\nI, *${trackedDonation.donorName}*, have contributed a Maha Dan of *₹${trackedDonation.amount.toLocaleString()}* for Satwara Samaj Student Welfare.\n\nCertificate No: *${trackedDonation.certificateNo}*`;
+    const text = `🙏 *સમસ્ત સતવારા મહામંડળ - અમદાવાદ* 🙏\n\nહું, *${trackedDonation.donorName}*, સતવારા સમાજ વિદ્યાર્થી કલ્યાણ માટે *₹${trackedDonation.amount.toLocaleString()}* નું મહા દાન અર્પણ કરેલ છે.\n\nસન્માન પત્રક નં: *${trackedDonation.certificateNo}*`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -260,13 +260,13 @@ export default function MahaDanPage() {
             <Heart size={36} color="#DC2626" />
           </div>
           <h2 className="heading-serif" style={{ fontSize: '1.9rem', color: '#0F172A', fontWeight: 'bold', marginBottom: '14px' }}>
-            Maha Dan Online Submissions Currently Closed
+            મહા દાન ઓનલાઇન પોર્ટલ હાલ પૂરતું બંધ છે
           </h2>
           <p style={{ color: '#475569', lineHeight: '1.7', fontSize: '1.05rem', marginBottom: '28px' }}>
             મહા દાન ઓનલાઇન પોર્ટલ હાલ પૂરતું બંધ રાખવામાં આવેલ છે. સમસ્ત સતવારા મહામંડળ સંસ્થાને પ્રોત્સાહન અને સાથ-સહકાર આપવા બદલ આપનો ખૂબ ખૂબ આભાર.
           </p>
           <a href="/" className="btn btn-primary" style={{ padding: '12px 28px', fontSize: '1rem' }}>
-            Return to Homepage
+            મુખ્ય પૃષ્ઠ (હોમપેજ) પર પાછા જાઓ
           </a>
         </div>
       </div>
@@ -280,27 +280,27 @@ export default function MahaDanPage() {
       <section style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)', color: '#ffffff', padding: '56px 0', borderBottom: '4px solid #F59E0B', position: 'relative' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245, 158, 11, 0.25)', color: '#FFD700', border: '1px solid #F59E0B', borderRadius: '30px', padding: '6px 20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '14px' }}>
-            <Sparkles size={16} color="#FFD700" /> Samast Satwara Mahamandal Initiative
+            <Sparkles size={16} color="#FFD700" /> સમસ્ત સતવારા મહામંડળ આયોજન
           </div>
           <h1 style={{ fontSize: '2.5rem', color: '#FFFFFF', margin: '0 0 10px 0', fontWeight: 800, fontFamily: 'serif, sans-serif' }}>
-            MAHA DAN PORTAL & HONOR CERTIFICATES
+            મહા દાન પોર્ટલ અને સન્માન પત્રક
           </h1>
           <p style={{ maxWidth: '720px', margin: '0 auto 20px auto', color: '#F8FAFC', fontSize: '1.05rem', lineHeight: '1.6' }}>
-            Contribute to Satwara student hostels, digital libraries, and merit scholarships with instant QR payment & personalized Honor Certificates.
+            સતવારા સમાજના વિદ્યાર્થીઓ માટે છાત્રાલય, ડિજિટલ લાઈબ્રેરી અને તેજસ્વી વિદ્યાર્થી શિષ્યવૃત્તિ માટે ઓનલાઇન મહા દાન અને ડિજિટલ સન્માન પત્રક.
           </p>
 
           {/* Live Stats Pill Strip */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '24px', background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '50px', padding: '10px 28px', flexWrap: 'wrap', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Heart size={18} fill="#F59E0B" color="#F59E0B" />
-              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>Total Donation Received:</span>
+              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>કુલ દાન રકમ:</span>
               <strong style={{ fontSize: '1.15rem', color: '#FFD700' }}>₹ {Number(publicStats.totalAmount || 0).toLocaleString('en-IN')}</strong>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255, 255, 255, 0.2)', height: '20px' }} className="hide-mobile"></div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Award size={18} color="#60A5FA" />
-              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>Total Donors:</span>
-              <strong style={{ fontSize: '1.15rem', color: '#60A5FA' }}>{(publicStats.totalDonors || 0).toLocaleString('en-IN')} Donors</strong>
+              <span style={{ fontSize: '0.88rem', color: '#CBD5E1' }}>કુલ દાતાઓ:</span>
+              <strong style={{ fontSize: '1.15rem', color: '#60A5FA' }}>{(publicStats.totalDonors || 0).toLocaleString('en-IN')} દાતાઓ</strong>
             </div>
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function MahaDanPage() {
             onClick={() => setActiveTab('donate')}
             style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            <Heart fill={activeTab === 'donate' ? '#FFD700' : 'none'} size={18} /> Contribute Online (UPI QR)
+            <Heart fill={activeTab === 'donate' ? '#FFD700' : 'none'} size={18} /> ઓનલાઇન મહા દાન આપો (UPI QR)
           </button>
           
           <button
@@ -323,7 +323,7 @@ export default function MahaDanPage() {
             onClick={() => setActiveTab('track')}
             style={{ padding: '12px 28px', fontSize: '1rem', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            <Search size={18} /> Track Status & Download Certificate
+            <Search size={18} /> દાન સ્થિતિ તપાસો અને સન્માન પત્રક જુઓ
           </button>
         </div>
 
@@ -337,14 +337,14 @@ export default function MahaDanPage() {
                   <ShieldCheck size={38} />
                 </div>
                 <h2 style={{ fontSize: '1.8rem', color: '#0F172A', fontWeight: 'bold', marginBottom: '10px' }}>
-                  Payment Proof Submitted Successfully!
+                  પેમેન્ટ પુરાવો સફળતાપૂર્વક સબમિટ થયો!
                 </h2>
                 <p style={{ color: '#475569', fontSize: '0.95rem', marginBottom: '18px' }}>
-                  Thank you, <strong>{submittedDonation.donorName}</strong>. Your donation of <strong>₹{submittedDonation.amount.toLocaleString()}</strong> has been submitted. Our trust admins are verifying the transaction screenshot.
+                  આભાર, <strong>{submittedDonation.donorName}</strong>. આપનું <strong>₹{submittedDonation.amount.toLocaleString()}</strong> નું મહા દાન સબમિટ થઈ ગયેલ છે. સંસ્થાના એડમિન દ્વારા ટ્રાન્ઝેક્શન ચકાસવામાં આવી રહ્યું છે.
                 </p>
 
                 <div style={{ background: '#f8fafc', border: '2px dashed var(--primary-maroon)', padding: '10px 20px', borderRadius: '12px', marginBottom: '24px', display: 'inline-block' }}>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Your Maha Dan Reference ID</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>તમારો મહા દાન રેફરન્સ આઈડી</div>
                   <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary-maroon)', letterSpacing: '1px' }}>
                     {submittedDonation.certificateNo}
                   </div>
@@ -363,7 +363,7 @@ export default function MahaDanPage() {
                     }}
                     className="btn btn-primary"
                   >
-                    Track Verification Status
+                    ચકાસણી સ્થિતિ તપાસો
                   </button>
                   <button
                     onClick={() => {
@@ -374,7 +374,7 @@ export default function MahaDanPage() {
                     }}
                     className="btn btn-outline"
                   >
-                    Make Another Donation
+                    બીજું દાન કરો
                   </button>
                 </div>
               </div>
@@ -385,21 +385,21 @@ export default function MahaDanPage() {
                 <div>
                   <div className="card" style={{ padding: '28px', marginBottom: '20px' }}>
                     <h3 className="heading-serif" style={{ color: 'var(--primary-maroon)', fontSize: '1.35rem', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Heart fill="var(--primary-maroon)" color="var(--primary-maroon)" size={22} /> Why Contribute Maha Dan?
+                      <Heart fill="var(--primary-maroon)" color="var(--primary-maroon)" size={22} /> મહા દાન શા માટે આપવું?
                     </h3>
                     <p style={{ color: '#475569', lineHeight: '1.7', fontSize: '0.93rem' }}>
-                      Samast Satwara Mahamandal operates modern hostels and educational welfare programs for Satwara community boys and girls studying in Ahmedabad and Anand.
+                      સમસ્ત સતવારા મહામંડળ અમદાવાદ અને આણંદ ખાતે અભ્યાસ કરતા સતવારા સમાજના ભાઈઓ-બહેનો માટે આધુનિક છાત્રાલય અને શૈક્ષણિક કલ્યાણ યોજનાઓ ચલાવે છે.
                     </p>
 
                     <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       <li style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '0.88rem', color: '#1E293B' }}>
-                        <CheckCircle size={18} color="var(--primary-maroon)" /> Hostel Facility & Digital Library Development
+                        <CheckCircle size={18} color="var(--primary-maroon)" /> છાત્રાલય સુવિધા અને ડિજિટલ લાઈબ્રેરી વિકાસ
                       </li>
                       <li style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '0.88rem', color: '#1E293B' }}>
-                        <CheckCircle size={18} color="var(--primary-maroon)" /> Merit Scholarships for Deserving Students
+                        <CheckCircle size={18} color="var(--primary-maroon)" /> તેજસ્વી અને જરૂરિયાતમંદ વિદ્યાર્થીઓ માટે શિષ્યવૃત્તિ
                       </li>
                       <li style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '0.88rem', color: '#1E293B' }}>
-                        <CheckCircle size={18} color="var(--primary-maroon)" /> Hygienic Mess & Accommodation Support
+                        <CheckCircle size={18} color="var(--primary-maroon)" /> પૌષ્ટિક ભોજન (મેસ) અને રહેઠાણ સુવિધા સહાય
                       </li>
                     </ul>
                   </div>
@@ -407,9 +407,9 @@ export default function MahaDanPage() {
                   <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '14px', padding: '20px', display: 'flex', gap: '14px', alignItems: 'center' }}>
                     <ShieldCheck size={36} color="#B8860B" style={{ flexShrink: 0 }} />
                     <div>
-                      <h4 style={{ margin: '0 0 4px 0', color: '#92400E', fontSize: '0.95rem' }}>Instant QR Code Payment</h4>
+                      <h4 style={{ margin: '0 0 4px 0', color: '#92400E', fontSize: '0.95rem' }}>ઇન્સ્ટન્ટ QR કોડ પેમેન્ટ</h4>
                       <p style={{ margin: 0, fontSize: '0.82rem', color: '#B45309' }}>
-                        Scan Trust UPI QR code via GPay / PhonePe / Paytm, upload payment screenshot, and get your verified Honor Certificate.
+                        GPay / PhonePe / Paytm દ્વારા સંસ્થાના UPI QR કોડ પર દાન કરો, પેમેન્ટનો સ્ક્રિનશોટ અપલોડ કરો અને તુરંત તમારું સન્માન પત્રક મેળવો.
                       </p>
                     </div>
                   </div>
@@ -418,7 +418,7 @@ export default function MahaDanPage() {
                 {/* Right Column: Donation Form */}
                 <div className="card" style={{ padding: '32px' }}>
                   <h3 className="heading-serif" style={{ color: 'var(--primary-maroon)', fontSize: '1.35rem', marginTop: 0, marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #F1F5F9' }}>
-                    Select Donation Amount or Enter Custom
+                    દાનની રકમ પસંદ કરો અથવા કસ્ટમ રકમ ઉમેરો
                   </h3>
 
                   {errorMsg && (
@@ -430,7 +430,7 @@ export default function MahaDanPage() {
                   <form onSubmit={handleInitiatePayment}>
                     <div style={{ marginBottom: '24px' }}>
                       <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#1E293B', marginBottom: '10px' }}>
-                        Select Donation Amount (₹)
+                        દાનની રકમ પસંદ કરો (₹)
                       </label>
                       <div className="public-mahadan-amount-grid">
                         {predefinedAmounts.map((amt) => {
@@ -460,13 +460,13 @@ export default function MahaDanPage() {
 
                     <div className="form-group" style={{ marginBottom: '16px' }}>
                       <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>
-                        Full Name *
+                        દાતાનું પૂરું નામ *
                       </label>
                       <input
                         type="text"
                         name="donorName"
                         required
-                        placeholder="e.g. Ramesh Bhai Satvara"
+                        placeholder="દા.ત. રમેશભાઈ સતવારા"
                         value={formData.donorName}
                         onChange={handleInputChange}
                         className="form-control"
@@ -475,22 +475,22 @@ export default function MahaDanPage() {
 
                     <div className="public-mahadan-input-grid">
                       <div className="form-group">
-                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>Mobile Number</label>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>મોબાઈલ નંબર</label>
                         <input
                           type="tel"
                           name="mobile"
-                          placeholder="e.g. 9876543210"
+                          placeholder="દા.ત. 9876543210"
                           value={formData.mobile}
                           onChange={handleInputChange}
                           className="form-control"
                         />
                       </div>
                       <div className="form-group">
-                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>Email Address</label>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569' }}>ઈમેઈલ સરનામું</label>
                         <input
                           type="email"
                           name="email"
-                          placeholder="e.g. donor@example.com"
+                          placeholder="દા.ત. donor@example.com"
                           value={formData.email}
                           onChange={handleInputChange}
                           className="form-control"
@@ -501,7 +501,7 @@ export default function MahaDanPage() {
                     {/* Photo Upload for Certificate */}
                     <div className="form-group" style={{ marginBottom: '20px' }}>
                       <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '6px' }}>
-                        Upload Donor Photo (for Honor Certificate Card)
+                        દાતાનો ફોટો અપલોડ કરો (સન્માન પત્રક માટે)
                       </label>
                       <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                         <div style={{ width: '54px', height: '54px', borderRadius: '50%', background: '#F1F5F9', border: '2px dashed #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
@@ -529,7 +529,7 @@ export default function MahaDanPage() {
                         gap: '10px',
                       }}
                     >
-                      <QrCode size={20} /> Proceed to Scan QR Code & Pay (₹ {parseFloat(formData.amount).toLocaleString()})
+                      <QrCode size={20} /> સ્કૅન QR કોડ અને પેમેન્ટ કરો (₹ {parseFloat(formData.amount).toLocaleString()})
                     </button>
                   </form>
                 </div>
@@ -543,16 +543,16 @@ export default function MahaDanPage() {
           <div style={{ maxWidth: '820px', margin: '0 auto' }}>
             <div className="card" style={{ padding: '30px', marginBottom: '30px', textAlign: 'center' }}>
               <h2 className="heading-serif" style={{ fontSize: '1.6rem', color: 'var(--primary-navy)', marginBottom: '12px' }}>
-                Track Maha Dan Verification Status & Certificate
+                મહા દાન ચકાસણી સ્થિતિ અને સન્માન પત્રક જુઓ
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
-                Enter your <strong>Maha Dan Reference ID</strong> (e.g. <code>MD-2026-8819</code>) or your registered <strong>Mobile Number</strong>.
+                તમારો <strong>મહા દાન રેફરન્સ આઈડી</strong> (દા.ત. <code>MD-2026-8819</code>) અથવા <strong>મોબાઈલ નંબર</strong> દાખલ કરો.
               </p>
 
               <form onSubmit={handleTrackDonation} style={{ display: 'flex', gap: '12px', maxWidth: '540px', margin: '0 auto' }}>
                 <input
                   type="text"
-                  placeholder="Enter Reference ID or Mobile Number..."
+                  placeholder="રેફરન્સ આઈડી અથવા મોબાઈલ નંબર દાખલ કરો..."
                   value={trackQuery}
                   onChange={(e) => setTrackQuery(e.target.value)}
                   className="form-control"
@@ -560,7 +560,7 @@ export default function MahaDanPage() {
                   required
                 />
                 <button type="submit" className="btn btn-primary" disabled={trackingLoading} style={{ padding: '0 24px', whiteSpace: 'nowrap' }}>
-                  {trackingLoading ? 'Searching...' : 'Track Status'}
+                  {trackingLoading ? 'શોધી રહ્યા છીએ...' : 'સ્થિતિ શોધો'}
                 </button>
               </form>
 
@@ -582,13 +582,13 @@ export default function MahaDanPage() {
                         <RefreshCw size={28} className="spin-slow" />
                       </div>
                       <h3 style={{ fontSize: '1.4rem', color: '#B45309', fontWeight: 'bold', marginBottom: '8px' }}>
-                        Status: Under Verification by Trust Admin
+                        સ્થિતિ: ટ્રસ્ટ એડમિન દ્વારા ચકાસણી હેઠળ છે
                       </h3>
                       <p style={{ color: '#92400E', fontSize: '0.92rem', maxWidth: '580px', margin: '0 auto 16px auto' }}>
-                        We have received your payment screenshot for donation of <strong>₹{trackedDonation.amount.toLocaleString()}</strong>. Trust admins are verifying your transaction UTR (<code>{trackedDonation.transactionId}</code>).
+                        અમને આપનું <strong>₹{trackedDonation.amount.toLocaleString()}</strong> ના દાનનું પેમેન્ટ સ્ક્રિનશોટ મળેલ છે. ટ્રસ્ટ એડમિન ટ્રાન્ઝેક્શન UTR (<code>{trackedDonation.transactionId}</code>) ચકાસી રહ્યા છે.
                       </p>
                       <span className="badge badge-reserved" style={{ fontSize: '0.85rem', padding: '6px 14px' }}>
-                        Reference ID: {trackedDonation.certificateNo}
+                        રેફરન્સ આઈડી: {trackedDonation.certificateNo}
                       </span>
                     </div>
 
@@ -604,13 +604,13 @@ export default function MahaDanPage() {
                       <AlertCircle size={32} />
                     </div>
                     <h3 style={{ fontSize: '1.4rem', color: '#991B1B', fontWeight: 'bold', marginBottom: '8px' }}>
-                      Status: Payment Screenshot Rejected
+                      સ્થિતિ: પેમેન્ટ સ્ક્રિનશોટ અસ્વીકાર થયો
                     </h3>
                     <p style={{ color: '#7F1D1D', fontSize: '0.92rem', maxWidth: '580px', margin: '0 auto 16px auto' }}>
-                      Reason: <strong>{trackedDonation.rejectionReason || 'Uploaded screenshot could not be matched with trust bank accounts.'}</strong>
+                      કારણ: <strong>{trackedDonation.rejectionReason || 'અપલોડ કરેલ સ્ક્રિનશોટ ટ્રસ્ટ બેંક ખાતા સાથે મેચ થયો નથી.'}</strong>
                     </p>
                     <p style={{ fontSize: '0.85rem', color: '#991B1B' }}>
-                      Please contact trust office at +91 7043704446 for assistance.
+                      વધુ માહિતી માટે ટ્રસ્ટ કાર્યાલય (+91 7043704446) પર સંપર્ક કરો.
                     </p>
                   </div>
                 )}
@@ -620,7 +620,7 @@ export default function MahaDanPage() {
                   <div>
                     <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '20px', textAlign: 'center', marginBottom: '24px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#15803D', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                        <CheckCircle size={24} /> Payment Verified — Honor Certificate Issued!
+                        <CheckCircle size={24} /> પેમેન્ટ ચકાસાયેલ છે — સન્માન પત્રક ઈશ્યુ થઈ ગયેલ છે!
                       </div>
                     </div>
 
@@ -641,7 +641,7 @@ export default function MahaDanPage() {
           <div className="modal-content" style={{ maxWidth: '580px', padding: '30px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
               <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-navy)', margin: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <QrCode color="var(--primary-maroon)" size={24} /> Scan UPI QR Code & Pay
+                <QrCode color="var(--primary-maroon)" size={24} /> UPI QR કોડ સ્કૅન કરો અને ચૂકવણી કરો
               </h3>
               <button onClick={() => setShowQRModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                 <X size={20} />
@@ -649,9 +649,9 @@ export default function MahaDanPage() {
             </div>
 
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Donor: <strong>{formData.donorName}</strong></div>
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>દાતાનું નામ: <strong>{formData.donorName}</strong></div>
               <div style={{ fontSize: '1.6rem', color: 'var(--primary-maroon)', fontWeight: 800, margin: '4px 0' }}>
-                Payable Amount: ₹ {parseFloat(formData.amount).toLocaleString()}
+                દાન આપવાની રકમ: ₹ {parseFloat(formData.amount).toLocaleString()}
               </div>
 
               {/* QR CODE CONTAINER — Admin uploaded image OR auto-generated UPI QR */}
@@ -664,7 +664,7 @@ export default function MahaDanPage() {
                       style={{ width: '200px', height: '200px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
                     />
                     <div style={{ marginTop: '8px', fontSize: '0.82rem', fontWeight: 'bold', color: 'var(--primary-navy)', textAlign: 'center' }}>
-                      Scan to Pay — Trust Official QR
+                      ચૂકવણી કરવા માટે સ્કૅન કરો — સંસ્થાનું અધિકૃત QR
                     </div>
                   </>
                 ) : (
@@ -682,7 +682,7 @@ export default function MahaDanPage() {
               </div>
 
               <p style={{ fontSize: '0.85rem', color: '#64748B', maxWidth: '420px', margin: '0 auto' }}>
-                Scan using Google Pay, PhonePe, Paytm, or BHIM app. After completing the payment, upload your payment screenshot below.
+                Google Pay, PhonePe, Paytm, અથવા BHIM એપ વડે સ્કૅન કરો. પેમેન્ટ પૂર્ણ કર્યા પછી, નીચે તમારો પેમેન્ટ સ્ક્રિનશોટ અપલોડ કરો.
               </p>
             </div>
 
@@ -690,7 +690,7 @@ export default function MahaDanPage() {
               {/* UPLOAD SCREENSHOT */}
               <div className="form-group" style={{ marginBottom: '16px' }}>
                 <label style={{ fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--primary-navy)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ImageIcon size={16} /> Upload Payment Screenshot Proof *
+                  <ImageIcon size={16} /> પેમેન્ટ સ્ક્રિનશોટ પુરાવો અપલોડ કરો *
                 </label>
                 <input
                   type="file"
@@ -701,7 +701,7 @@ export default function MahaDanPage() {
                 />
                 {paymentScreenshotBase64 && (
                   <div style={{ marginTop: '6px', fontSize: '0.8rem', color: 'green', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <CheckCircle size={14} /> Screenshot Uploaded Successfully
+                    <CheckCircle size={14} /> સ્ક્રિનશોટ સફળતાપૂર્વક અપલોડ થયો
                   </div>
                 )}
               </div>
@@ -714,10 +714,10 @@ export default function MahaDanPage() {
 
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button type="button" className="btn btn-outline" onClick={() => setShowQRModal(false)} style={{ flex: 1 }}>
-                  Cancel
+                  રદ કરો
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submittingPayment} style={{ flex: 1 }}>
-                  {submittingPayment ? 'Submitting Proof...' : 'Submit Payment Proof'}
+                  {submittingPayment ? 'સબમિટ થઈ રહ્યું છે...' : 'પેમેન્ટ પુરાવો સબમિટ કરો'}
                 </button>
               </div>
             </form>
