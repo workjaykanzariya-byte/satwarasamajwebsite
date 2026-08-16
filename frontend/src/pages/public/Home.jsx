@@ -218,69 +218,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hostels & Live Vacancy Cards Section */}
-      <section style={{ padding: '60px 0' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 40px auto' }}>
-            <h2 className="heading-serif" style={{ fontSize: '2rem', color: 'var(--primary-maroon)', marginBottom: '10px' }}>
-              {settings.home_hostel_title || t('hostel_status_title')}
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem' }}>
-              {settings.home_hostel_sub || t('hostel_status_sub')}
-            </p>
-          </div>
-
-          <div className="home-hostel-grid">
-            {hostels.map((hostel) => (
-              <div key={hostel.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                    <span className={`badge ${hostel.type === 'BOYS' ? 'badge-primary' : 'badge-reserved'}`}>
-                      {hostel.type === 'BOYS' ? '🚹 Boys Hostel' : '🚺 Girls Hostel'}
-                    </span>
-                    <span className="badge badge-vacant" style={{ fontSize: '0.8rem', padding: '5px 12px' }}>
-                      🟢 {hostel.availableBeds} Live Beds Available
-                    </span>
-                  </div>
-
-                  <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-navy)', marginBottom: '8px' }}>
-                    {hostel.name}
-                  </h3>
-
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                    {hostel.description}
-                  </p>
-
-                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: 'var(--radius-sm)', marginBottom: '16px', fontSize: '0.85rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span>Total Capacity:</span>
-                      <strong>{hostel.totalCapacity} Beds</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span>Occupied Beds:</span>
-                      <strong>{hostel.occupiedBeds} Beds</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Warden Contact:</span>
-                      <strong>{hostel.wardenContact}</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <Link to={`/hostels/${hostel.id}`} className="btn btn-outline btn-sm" style={{ flex: 1 }}>
-                    View Hostel Profile
-                  </Link>
-                  <Link to={`/apply?hostel=${hostel.id}`} className="btn btn-primary btn-sm" style={{ flex: 1 }}>
-                    Apply Now
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* UPCOMING MODERN GIRLS HOSTEL PROJECT SECTION */}
       <section style={{ background: 'linear-gradient(135deg, #FDFBF7 0%, #FFFBEB 50%, #FEF3C7 100%)', padding: '64px 0', borderTop: '2px solid #FCD34D', borderBottom: '2px solid #FCD34D', position: 'relative', overflow: 'hidden' }}>
         <div className="container">
@@ -445,6 +382,69 @@ export default function Home() {
               <h4 style={{ fontSize: '0.95rem', marginBottom: '4px' }}>{settings.home_step5_title || 'Hostel Joining'}</h4>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{settings.home_step5_sub || 'Fee confirmation & room check-in'}</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Hostels & Live Vacancy Cards Section */}
+      <section style={{ padding: '60px 0' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 40px auto' }}>
+            <h2 className="heading-serif" style={{ fontSize: '2rem', color: 'var(--primary-maroon)', marginBottom: '10px' }}>
+              {settings.home_hostel_title || t('hostel_status_title')}
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem' }}>
+              {settings.home_hostel_sub || t('hostel_status_sub')}
+            </p>
+          </div>
+
+          <div className="home-hostel-grid">
+            {hostels.map((hostel) => (
+              <div key={hostel.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <span className={`badge ${hostel.type === 'BOYS' ? 'badge-primary' : 'badge-reserved'}`}>
+                      {hostel.type === 'BOYS' ? '🚹 Boys Hostel' : '🚺 Girls Hostel'}
+                    </span>
+                    <span className="badge badge-vacant" style={{ fontSize: '0.8rem', padding: '5px 12px' }}>
+                      🟢 {hostel.availableBeds} Live Beds Available
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-navy)', marginBottom: '8px' }}>
+                    {hostel.name}
+                  </h3>
+
+                  <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                    {hostel.description}
+                  </p>
+
+                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: 'var(--radius-sm)', marginBottom: '16px', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span>Total Capacity:</span>
+                      <strong>{hostel.totalCapacity} Beds</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span>Occupied Beds:</span>
+                      <strong>{hostel.occupiedBeds} Beds</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Warden Contact:</span>
+                      <strong>{hostel.wardenContact}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Link to={`/hostels/${hostel.id}`} className="btn btn-outline btn-sm" style={{ flex: 1 }}>
+                    View Hostel Profile
+                  </Link>
+                  <Link to={`/apply?hostel=${hostel.id}`} className="btn btn-primary btn-sm" style={{ flex: 1 }}>
+                    Apply Now
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
