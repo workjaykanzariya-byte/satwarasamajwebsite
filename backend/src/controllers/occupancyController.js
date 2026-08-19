@@ -88,7 +88,7 @@ const getHostelsSummary = async (req, res, next) => {
         wardenEmail: hostel.wardenEmail,
         description: hostel.description,
         image: hostel.image,
-        totalCapacity: hostel.totalCapacity || totalBeds,
+        totalCapacity: (hostel.totalCapacity !== undefined && hostel.totalCapacity !== null) ? hostel.totalCapacity : totalBeds,
         totalBeds,
         occupiedBeds: occupied,
         availableBeds: vacant,
