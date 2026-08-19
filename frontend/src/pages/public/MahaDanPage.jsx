@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 import MahaDanCreativeCard from '../../components/common/MahaDanCreativeCard';
@@ -17,6 +18,7 @@ const getImageUrl = (path) => {
 
 export default function MahaDanPage() {
   const { t, language } = useLanguage();
+  const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState('donate'); // 'donate' or 'track'
   const [mahadanStatus, setMahadanStatus] = useState('OPEN');
@@ -37,6 +39,30 @@ export default function MahaDanPage() {
       }
     }).catch(() => {});
   }, []);
+
+  // Auto-track if URL contains ?ref=... or ?track=...
+  useEffect(() => {
+    const refParam = searchParams.get('ref') || searchParams.get('track') || searchParams.get('certificateNo');
+    if (refParam) {
+      setActiveTab('track');
+      setTrackQuery(refParam);
+      setTrackingLoading(true);
+      setTrackError('');
+      setTrackedDonation(null);
+      api.get(`/mahadan/track/${encodeURIComponent(refParam.trim())}`)
+        .then((res) => {
+          if (res.data.success && res.data.donation) {
+            setTrackedDonation(res.data.donation);
+          }
+        })
+        .catch((err) => {
+          setTrackError(err.response?.data?.message || 'No donation record found for this Reference ID or Mobile Number.');
+        })
+        .finally(() => {
+          setTrackingLoading(false);
+        });
+    }
+  }, [searchParams]);
 
   // Form State
   const [formData, setFormData] = useState({

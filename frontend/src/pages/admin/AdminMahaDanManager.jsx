@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import MahaDanCreativeCard from '../../components/common/MahaDanCreativeCard';
-import { Heart, Search, CheckCircle, XCircle, Eye, Download, ShieldCheck, DollarSign, Award, RefreshCw, User, Image as ImageIcon, X, Palette, Trash2, Power, QrCode, Upload, FileSpreadsheet } from 'lucide-react';
+import { Heart, Search, CheckCircle, XCircle, Eye, Download, ShieldCheck, DollarSign, Award, RefreshCw, User, Image as ImageIcon, X, Palette, Trash2, Power, QrCode, Upload, FileSpreadsheet, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 const getImageUrl = (path) => {
   if (!path) return null;
@@ -19,6 +19,10 @@ export default function AdminMahaDanManager() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
 
   // Portal Master Status Setting
   const [portalStatus, setPortalStatus] = useState('OPEN');
@@ -53,6 +57,11 @@ export default function AdminMahaDanManager() {
   const [extraAmount, setExtraAmount] = useState('0');
   const [extraDonors, setExtraDonors] = useState('0');
   const [savingDisplaySettings, setSavingDisplaySettings] = useState(false);
+
+  // Reset pagination to page 1 on filter or search or page size change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, searchQuery, pageSize]);
 
   // Download Sample CSV Template
   const handleDownloadSampleCSV = () => {
@@ -319,6 +328,18 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
     );
   });
 
+  // Pagination Calculations
+  const totalCount = filteredDonations.length;
+  const totalPages = pageSize === 'ALL' ? 1 : Math.max(1, Math.ceil(totalCount / Number(pageSize)));
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+  const paginatedDonations = pageSize === 'ALL'
+    ? filteredDonations
+    : filteredDonations.slice((validCurrentPage - 1) * Number(pageSize), validCurrentPage * Number(pageSize));
+
+  const isPageAllSelected =
+    paginatedDonations.length > 0 && paginatedDonations.every((d) => selectedIds.has(d.id));
+
   // Checkbox helpers
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
@@ -329,15 +350,138 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
     });
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.size === filteredDonations.length && filteredDonations.length > 0) {
-      setSelectedIds(new Set());
+  const toggleSelectPage = () => {
+    if (isPageAllSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        paginatedDonations.forEach((d) => next.delete(d.id));
+        return next;
+      });
     } else {
-      setSelectedIds(new Set(filteredDonations.map((d) => d.id)));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        paginatedDonations.forEach((d) => next.add(d.id));
+        return next;
+      });
     }
   };
 
-  const allSelected = filteredDonations.length > 0 && selectedIds.size === filteredDonations.length;
+  const selectAllFiltered = () => {
+    setSelectedIds(new Set(filteredDonations.map((d) => d.id)));
+  };
+
+  const getPageNumbers = () => {
+    const delta = 2;
+    const range = [];
+    for (
+      let i = Math.max(2, validCurrentPage - delta);
+      i <= Math.min(totalPages - 1, validCurrentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (validCurrentPage - delta > 2) {
+      range.unshift('...');
+    }
+    if (validCurrentPage + delta < totalPages - 1) {
+      range.push('...');
+    }
+
+    range.unshift(1);
+    if (totalPages > 1 && !range.includes(totalPages)) {
+      range.push(totalPages);
+    }
+
+    return range;
+  };
+
+  // CSV Export with Creative Card URLs
+  const handleExportCSV = () => {
+    if (filteredDonations.length === 0) {
+      alert('No donation records available to export.');
+      return;
+    }
+
+    const headers = [
+      'Ref ID / Certificate No',
+      'Date',
+      'Donor Name',
+      'Mobile Number',
+      'Email',
+      'Amount (INR)',
+      'Payment Mode',
+      'Transaction / UTR No',
+      'Status',
+      'Creative Card URL',
+      'Donor Photo URL',
+      'Payment Screenshot URL',
+      'Message / Notes',
+      'Rejection Reason',
+    ];
+
+    const rows = filteredDonations.map((d) => {
+      const refId = d.certificateNo || '';
+      const date = d.createdAt ? new Date(d.createdAt).toISOString().split('T')[0] : '';
+      const donorName = d.donorName || '';
+      const mobile = d.mobile ? `'${d.mobile}` : '';
+      const email = d.email || '';
+      const amount = d.amount || 0;
+      const paymentMode = d.paymentMode || 'UPI_QR';
+      const utr = d.transactionId ? `'${d.transactionId}` : '';
+      const status = d.verificationStatus || '';
+      const creativeUrl = refId ? `${window.location.origin}/mahadan?ref=${encodeURIComponent(refId)}` : '';
+
+      let photoUrl = '';
+      if (d.photoPath) {
+        photoUrl = d.photoPath.startsWith('http') ? d.photoPath : `${window.location.origin}${getImageUrl(d.photoPath)}`;
+      }
+
+      let screenshotUrl = '';
+      if (d.paymentScreenshot) {
+        screenshotUrl = d.paymentScreenshot.startsWith('http') ? d.paymentScreenshot : `${window.location.origin}${getImageUrl(d.paymentScreenshot)}`;
+      }
+
+      const message = d.message || '';
+      const rejectionReason = d.rejectionReason || '';
+
+      return [
+        refId,
+        date,
+        donorName,
+        mobile,
+        email,
+        amount,
+        paymentMode,
+        utr,
+        status,
+        creativeUrl,
+        photoUrl,
+        screenshotUrl,
+        message,
+        rejectionReason,
+      ];
+    });
+
+    const csvContent =
+      '\uFEFF' +
+      [
+        headers.map((h) => `"${String(h).replace(/"/g, '""')}"`).join(','),
+        ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
+      ].join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const filterSuffix = filterStatus !== 'ALL' ? `_${filterStatus.toLowerCase()}` : '';
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.download = `mahadan_donors${filterSuffix}_${dateStr}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="container" style={{ padding: '40px 20px' }}>
@@ -354,6 +498,25 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleExportCSV}
+            className="btn"
+            style={{
+              background: 'linear-gradient(135deg, #059669, #10B981)',
+              color: '#FFFFFF',
+              fontWeight: 'bold',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+            }}
+            title="Export all currently filtered donors with creative URLs to CSV"
+          >
+            <Download size={18} /> 📊 Export Donors (CSV)
+          </button>
           <button
             onClick={() => {
               setShowImportModal(true);
@@ -609,14 +772,24 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
 
       {/* Bulk Delete Toolbar — shows when items are selected */}
       {selectedIds.size > 0 && (
-        <div style={{ background: 'linear-gradient(135deg, #FEF2F2, #FFF5F5)', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '14px 20px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <div style={{ background: 'linear-gradient(135deg, #FEF2F2, #FFF5F5)', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '14px 20px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Trash2 size={18} color="#DC2626" />
             </div>
             <div>
               <strong style={{ color: '#991B1B', fontSize: '0.95rem' }}>{selectedIds.size} record(s) selected</strong>
-              <div style={{ fontSize: '0.78rem', color: '#B91C1C' }}>Click "Delete Selected" to permanently remove these records.</div>
+              <div style={{ fontSize: '0.78rem', color: '#B91C1C' }}>
+                {selectedIds.size < totalCount && (
+                  <button
+                    onClick={selectAllFiltered}
+                    style={{ background: 'none', border: 'none', color: '#B91C1C', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontWeight: 'bold', marginRight: '6px' }}
+                  >
+                    Select all {totalCount} donors
+                  </button>
+                )}
+                Click "Delete Selected" to permanently remove these records.
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -644,10 +817,10 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
                 <th style={{ width: '44px', textAlign: 'center' }}>
                   <input
                     type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
+                    checked={isPageAllSelected}
+                    onChange={toggleSelectPage}
                     style={{ width: '17px', height: '17px', cursor: 'pointer', accentColor: '#DC2626' }}
-                    title="Select All"
+                    title={isPageAllSelected ? 'Deselect all on this page' : 'Select all on this page'}
                   />
                 </th>
                 <th>Ref ID / Date</th>
@@ -667,7 +840,7 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
                   </td>
                 </tr>
               ) : (
-                filteredDonations.map((d) => {
+                paginatedDonations.map((d) => {
                   const isSelected = selectedIds.has(d.id);
                   return (
                     <tr key={d.id} style={{ background: isSelected ? '#FFF5F5' : 'transparent', outline: isSelected ? '2px solid #FCA5A5' : 'none' }}>
@@ -766,6 +939,142 @@ Meena Ben Satvara,2500,,,,BANK_TRANSFER,APPROVED,Student scholarship`;
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls Footer */}
+        {totalCount > 0 && (
+          <div
+            style={{
+              padding: '16px 20px',
+              borderTop: '1px solid #E2E8F0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '14px',
+              background: '#F8FAFC',
+              borderBottomLeftRadius: 'var(--radius-md, 12px)',
+              borderBottomRightRadius: 'var(--radius-md, 12px)',
+            }}
+          >
+            {/* Left: Summary Count */}
+            <div style={{ fontSize: '0.88rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span>Showing</span>
+              <strong style={{ color: 'var(--primary-navy)' }}>
+                {pageSize === 'ALL' ? 1 : (validCurrentPage - 1) * Number(pageSize) + 1} -{' '}
+                {pageSize === 'ALL' ? totalCount : Math.min(validCurrentPage * Number(pageSize), totalCount)}
+              </strong>
+              <span>of</span>
+              <strong style={{ color: 'var(--primary-navy)' }}>{totalCount}</strong>
+              <span>Donors</span>
+              {selectedIds.size > 0 && (
+                <span style={{ marginLeft: '8px', background: '#FEE2E2', color: '#991B1B', padding: '2px 8px', borderRadius: '12px', fontSize: '0.78rem', fontWeight: 600 }}>
+                  {selectedIds.size} Selected
+                </span>
+              )}
+            </div>
+
+            {/* Middle: Rows Per Page Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#475569' }}>
+              <span>Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="form-control"
+                style={{ padding: '6px 12px', fontSize: '0.88rem', width: 'auto', borderRadius: '8px', background: '#FFFFFF' }}
+              >
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value="ALL">All ({totalCount})</option>
+              </select>
+            </div>
+
+            {/* Right: Page Navigation Buttons */}
+            {pageSize !== 'ALL' && totalPages > 1 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={validCurrentPage === 1}
+                  className="btn btn-outline btn-sm"
+                  style={{ padding: '6px 10px', opacity: validCurrentPage === 1 ? 0.4 : 1, cursor: validCurrentPage === 1 ? 'not-allowed' : 'pointer' }}
+                  title="First Page"
+                >
+                  <ChevronsLeft size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={validCurrentPage === 1}
+                  className="btn btn-outline btn-sm"
+                  style={{ padding: '6px 10px', opacity: validCurrentPage === 1 ? 0.4 : 1, cursor: validCurrentPage === 1 ? 'not-allowed' : 'pointer' }}
+                  title="Previous Page"
+                >
+                  <ChevronLeft size={16} /> Prev
+                </button>
+
+                <div style={{ display: 'flex', gap: '4px', margin: '0 4px' }}>
+                  {getPageNumbers().map((num, idx) => {
+                    if (num === '...') {
+                      return (
+                        <span key={`dots-${idx}`} style={{ padding: '6px 8px', color: '#94A3B8', fontSize: '0.88rem' }}>
+                          ...
+                        </span>
+                      );
+                    }
+                    const isCurrent = num === validCurrentPage;
+                    return (
+                      <button
+                        type="button"
+                        key={num}
+                        onClick={() => setCurrentPage(num)}
+                        className="btn btn-sm"
+                        style={{
+                          minWidth: '34px',
+                          padding: '6px 10px',
+                          fontWeight: isCurrent ? 800 : 500,
+                          background: isCurrent ? 'var(--primary-navy)' : '#FFFFFF',
+                          color: isCurrent ? '#FFFFFF' : '#334155',
+                          border: isCurrent ? 'none' : '1px solid #E2E8F0',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {num}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={validCurrentPage === totalPages}
+                  className="btn btn-outline btn-sm"
+                  style={{ padding: '6px 10px', opacity: validCurrentPage === totalPages ? 0.4 : 1, cursor: validCurrentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                  title="Next Page"
+                >
+                  Next <ChevronRight size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={validCurrentPage === totalPages}
+                  className="btn btn-outline btn-sm"
+                  style={{ padding: '6px 10px', opacity: validCurrentPage === totalPages ? 0.4 : 1, cursor: validCurrentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                  title="Last Page"
+                >
+                  <ChevronsRight size={16} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* SCREENSHOT ZOOM MODAL */}
