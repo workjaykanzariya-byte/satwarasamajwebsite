@@ -28,11 +28,22 @@ const fileFilter = (req, file, cb) => {
     'image/webp',
     'image/gif',
     'application/pdf',
+    'text/csv',
+    'text/plain',
+    'application/vnd.ms-excel',
+    'application/csv',
+    'text/x-csv',
+    'application/x-csv',
+    'text/comma-separated-values',
+    'text/x-comma-separated-values',
   ];
-  if (allowedTypes.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf', '.csv'];
+
+  if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPG, PNG, WEBP, GIF, and PDF files are allowed.'), false);
+    cb(new Error('Invalid file type. Only JPG, PNG, WEBP, GIF, PDF, and CSV files are allowed.'), false);
   }
 };
 

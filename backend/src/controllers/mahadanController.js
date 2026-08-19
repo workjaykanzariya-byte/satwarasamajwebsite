@@ -508,7 +508,9 @@ const getPublicStats = async (req, res, next) => {
  */
 const parseCSV = (csvText) => {
   if (!csvText || typeof csvText !== 'string') return [];
-  const lines = csvText.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  // Strip UTF-8 BOM if present
+  const cleanText = csvText.replace(/^\uFEFF/, '');
+  const lines = cleanText.split(/\r?\n/).filter((line) => line.trim().length > 0);
   if (lines.length === 0) return [];
 
   const parseRow = (text) => {
@@ -518,7 +520,12 @@ const parseCSV = (csvText) => {
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       if (char === '"') {
-        inQuotes = !inQuotes;
+        if (inQuotes && text[i + 1] === '"') {
+          current += '"';
+          i++; // skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
       } else if (char === ',' && !inQuotes) {
         result.push(current.trim());
         current = '';
@@ -527,10 +534,22 @@ const parseCSV = (csvText) => {
       }
     }
     result.push(current.trim());
-    return result.map((val) => val.replace(/^"|"$/g, '').trim());
+    return result.map((val) =>
+      val
+        .replace(/^"|"$/g, '')
+        .replace(/""/g, '"')
+        .replace(/^'/, '')
+        .trim()
+    );
   };
 
-  const headers = parseRow(lines[0]).map((h) => h.toLowerCase());
+  const headers = parseRow(lines[0]).map((h) =>
+    h
+      .toLowerCase()
+      .replace(/[\/()₹_-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
   const rows = [];
 
   for (let i = 1; i < lines.length; i++) {
@@ -577,15 +596,26 @@ const importCSVDonations = async (req, res, next) => {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const donorName = row.donorname || row['donor name'] || row.name || row.donor_name || '';
-      const amountRaw = row.amount || row.donationamount || row['amount (₹)'] || '';
-      const mobile = row.mobile || row.phone || row['mobile number'] || 'N/A';
-      const email = row.email || row['email address'] || null;
-      let certificateNo = row.certificateno || row.certificate_no || row['certificate no'] || '';
-      let transactionId = row.transactionid || row.transaction_id || row['utr / transaction id'] || '';
-      const paymentMode = row.paymentmode || row.payment_mode || row['payment mode'] || 'OFFLINE_IMPORT';
-      const verificationStatusRaw = (row.verificationstatus || row.status || row.verification_status || 'APPROVED').toUpperCase();
-      const message = row.message || row.remarks || row.note || null;
+
+      const getField = (...keys) => {
+        for (const k of keys) {
+          const normKey = k.toLowerCase().replace(/[\/()₹_-]/g, ' ').replace(/\s+/g, ' ').trim();
+          if (row[normKey] !== undefined && row[normKey] !== '') {
+            return String(row[normKey]).trim();
+          }
+        }
+        return '';
+      };
+
+      const donorName = getField('donorName', 'donor name', 'donor_name', 'name', 'full name');
+      const amountRaw = getField('amount', 'amount inr', 'amount ₹', 'donationamount', 'donation amount');
+      const mobile = getField('mobile', 'mobile number', 'phone', 'contact') || 'N/A';
+      const email = getField('email', 'email address') || null;
+      let certificateNo = getField('certificateNo', 'certificate no', 'ref id', 'ref id certificate no');
+      let transactionId = getField('transactionId', 'transaction id', 'utr', 'utr no', 'transaction utr no');
+      const paymentMode = getField('paymentMode', 'payment mode') || 'OFFLINE_IMPORT';
+      const verificationStatusRaw = (getField('verificationStatus', 'verification status', 'status') || 'APPROVED').toUpperCase();
+      const message = getField('message', 'message notes', 'remarks', 'note') || null;
 
       // Mandatory Field Validations
       if (!donorName || !donorName.trim()) {
@@ -593,7 +623,7 @@ const importCSVDonations = async (req, res, next) => {
         continue;
       }
 
-      const parsedAmount = parseFloat(amountRaw);
+      const parsedAmount = parseFloat(amountRaw.replace(/[^\d.]/g, ''));
       if (isNaN(parsedAmount) || parsedAmount <= 0) {
         failedRows.push({ rowNumber: i + 2, donorName, reason: 'Valid Donation Amount is mandatory.' });
         continue;
