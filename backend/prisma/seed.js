@@ -395,6 +395,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-august-2026.pdf',
+        displayOrder: 1,
         isPublished: true,
       },
       {
@@ -404,6 +405,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-july-2026.pdf',
+        displayOrder: 2,
         isPublished: true,
       },
       {
@@ -413,6 +415,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-june-2026.pdf',
+        displayOrder: 3,
         isPublished: true,
       },
       {
@@ -422,6 +425,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-may-2026.pdf',
+        displayOrder: 4,
         isPublished: true,
       },
       {
@@ -431,6 +435,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-april-2026.pdf',
+        displayOrder: 5,
         isPublished: true,
       },
       {
@@ -440,6 +445,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-march-2026.pdf',
+        displayOrder: 6,
         isPublished: true,
       },
       {
@@ -449,6 +455,7 @@ async function main() {
         year: '૨૦૨૬',
         coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
         pdfFile: '/documents/darpan-february-2026.pdf',
+        displayOrder: 7,
         isPublished: true,
       },
     ],
