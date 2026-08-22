@@ -165,12 +165,58 @@ export default function ContentManager() {
     }
   };
 
+  // Helper to convert base64 strings into direct uploaded files prior to save
+  const ensureUploadedUrl = async (dataOrUrl, prefix = 'file') => {
+    if (!dataOrUrl || typeof dataOrUrl !== 'string') return dataOrUrl;
+    if (dataOrUrl.startsWith('/api/') || dataOrUrl.startsWith('http://') || dataOrUrl.startsWith('https://')) {
+      return dataOrUrl;
+    }
+    if (dataOrUrl.startsWith('data:')) {
+      try {
+        const parts = dataOrUrl.split(',');
+        const mime = parts[0].split(':')[1].split(';')[0];
+        const b64Data = parts[1];
+        const byteCharacters = atob(b64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        let ext = '.png';
+        if (mime.includes('pdf')) ext = '.pdf';
+        else if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+        else if (mime.includes('webp')) ext = '.webp';
+
+        const blob = new Blob([byteArray], { type: mime });
+        const file = new File([blob], `${prefix}_${Date.now()}${ext}`, { type: mime });
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await api.post('/cms/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (res.data.success && res.data.fileUrl) {
+          return res.data.fileUrl;
+        }
+      } catch (err) {
+        console.warn('Auto upload of base64 failed, keeping as is:', err);
+      }
+    }
+    return dataOrUrl;
+  };
+
   // --- SETTINGS HANDLERS ---
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     setSavingSettings(true);
     try {
-      const res = await api.post('/cms/settings', settings);
+      const payload = { ...settings };
+      if (payload.president_photo && payload.president_photo.startsWith('data:')) {
+        payload.president_photo = await ensureUploadedUrl(payload.president_photo, 'president');
+      }
+      if (payload.secretary_photo && payload.secretary_photo.startsWith('data:')) {
+        payload.secretary_photo = await ensureUploadedUrl(payload.secretary_photo, 'secretary');
+      }
+      const res = await api.post('/cms/settings', payload);
       if (res.data.success) {
         alert('Site & Admission Settings saved successfully!');
       }
@@ -186,11 +232,15 @@ export default function ContentManager() {
     e.preventDefault();
     setSavingCommittee(true);
     try {
+      const payload = { ...committeeForm };
+      if (payload.photoPath && payload.photoPath.startsWith('data:')) {
+        payload.photoPath = await ensureUploadedUrl(payload.photoPath, 'committee');
+      }
       if (editingMemberId) {
-        await api.put(`/cms/committee/${editingMemberId}`, committeeForm);
+        await api.put(`/cms/committee/${editingMemberId}`, payload);
         alert('Committee member updated successfully!');
       } else {
-        await api.post('/cms/committee', committeeForm);
+        await api.post('/cms/committee', payload);
         alert('Committee member added successfully!');
       }
       setShowCommitteeModal(false);
@@ -259,11 +309,19 @@ export default function ContentManager() {
     e.preventDefault();
     setSavingDarpan(true);
     try {
+      const payload = { ...darpanForm };
+      if (payload.coverImage && payload.coverImage.startsWith('data:')) {
+        payload.coverImage = await ensureUploadedUrl(payload.coverImage, 'darpan_cover');
+      }
+      if (payload.pdfFile && payload.pdfFile.startsWith('data:')) {
+        payload.pdfFile = await ensureUploadedUrl(payload.pdfFile, 'darpan_doc');
+      }
+
       if (editingDarpanId) {
-        await api.put(`/cms/publications/${editingDarpanId}`, darpanForm);
+        await api.put(`/cms/publications/${editingDarpanId}`, payload);
         alert('Darpan publication updated successfully!');
       } else {
-        await api.post('/cms/publications', darpanForm);
+        await api.post('/cms/publications', payload);
         alert('Darpan publication created successfully!');
       }
       setShowDarpanModal(false);
@@ -271,7 +329,8 @@ export default function ContentManager() {
       fetchAllData();
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to save publication.');
+      const msg = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response.data : err.message) || 'Failed to save publication.';
+      alert(msg);
     } finally {
       setSavingDarpan(false);
     }
@@ -319,11 +378,15 @@ export default function ContentManager() {
     e.preventDefault();
     setSavingNews(true);
     try {
+      const payload = { ...newsForm };
+      if (payload.featuredImage && payload.featuredImage.startsWith('data:')) {
+        payload.featuredImage = await ensureUploadedUrl(payload.featuredImage, 'news');
+      }
       if (editingNewsId) {
-        await api.put(`/cms/news/${editingNewsId}`, newsForm);
+        await api.put(`/cms/news/${editingNewsId}`, payload);
         alert('News announcement updated successfully!');
       } else {
-        await api.post('/cms/news', newsForm);
+        await api.post('/cms/news', payload);
         alert('News announcement published successfully!');
       }
       setShowNewsModal(false);
