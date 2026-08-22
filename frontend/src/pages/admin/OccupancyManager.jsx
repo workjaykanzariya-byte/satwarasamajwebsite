@@ -209,35 +209,89 @@ export default function OccupancyManager() {
         </div>
       </div>
 
-      {/* HOSTEL SELECTOR TABS & STAT STRIP */}
-      <div className="card" style={{ padding: '20px', marginBottom: '30px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-          {/* Hostel Select Buttons */}
-          <div style={{ display: 'flex', gap: '12px' }}>
-            {hostels.map((h) => (
-              <button
+      {/* HOSTEL SELECTOR CARDS GRID */}
+      <div style={{ marginBottom: '30px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 style={{ fontSize: '1.15rem', color: 'var(--primary-navy)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+            <Building2 size={20} color="var(--primary-maroon)" /> Select Hostel Facility to Manage
+          </h3>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Showing {hostels.length} Hostel Locations
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          {hostels.map((h) => {
+            const isSelected = selectedHostelId === h.id;
+            return (
+              <div
                 key={h.id}
                 onClick={() => setSelectedHostelId(h.id)}
-                className={`btn ${selectedHostelId === h.id ? 'btn-primary' : 'btn-outline'}`}
+                className="card card-hover"
+                style={{
+                  padding: '18px 20px',
+                  cursor: 'pointer',
+                  borderRadius: '14px',
+                  background: isSelected ? '#FFFFFF' : '#FFFFFF',
+                  border: isSelected ? '2.5px solid var(--primary-maroon)' : '1px solid var(--border-light)',
+                  boxShadow: isSelected ? '0 8px 25px rgba(107, 29, 47, 0.12)' : '0 2px 8px rgba(0,0,0,0.03)',
+                  position: 'relative',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}
               >
-                🏢 {h.name}
-              </button>
-            ))}
-          </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      background: h.type === 'GIRLS' ? '#FDF2F8' : '#EFF6FF',
+                      color: h.type === 'GIRLS' ? '#BE185D' : '#1D4ED8',
+                      border: h.type === 'GIRLS' ? '1px solid #FBCFE8' : '1px solid #BFDBFE'
+                    }}>
+                      {h.type === 'GIRLS' ? '👧 Girls Hostel' : '👦 Boys Hostel'} • {h.city || 'Ahmedabad'}
+                    </span>
 
-          {/* Quick Stats for Active Hostel */}
-          {activeHostel && (
-            <div style={{ display: 'flex', gap: '16px', fontSize: '0.9rem' }}>
-              <div>Total Beds: <strong>{activeHostel.totalCapacity}</strong></div>
-              <div style={{ color: '#991b1b' }}>Occupied: <strong>{activeHostel.occupiedBeds}</strong></div>
-              <div style={{ color: '#166534' }}>Vacant: <strong>🟢 {activeHostel.availableBeds}</strong></div>
-            </div>
-          )}
+                    {isSelected && (
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: '6px', border: '1px solid #86EFAC' }}>
+                        ✓ Active
+                      </span>
+                    )}
+                  </div>
+
+                  <h4 style={{ fontSize: '1.02rem', color: isSelected ? 'var(--primary-maroon)' : 'var(--primary-navy)', fontWeight: 700, marginBottom: '14px', lineHeight: 1.4 }}>
+                    {h.name}
+                  </h4>
+                </div>
+
+                {/* Stat pills */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '8px 12px', borderRadius: '8px', fontSize: '0.82rem', border: '1px solid #F1F5F9' }}>
+                  <div>
+                    <span style={{ color: 'var(--text-muted)' }}>Beds: </span>
+                    <strong>{h.totalCapacity || 0}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#991B1B' }}>Occupied: </span>
+                    <strong style={{ color: '#991B1B' }}>{h.occupiedBeds || 0}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#166534' }}>Vacant: </span>
+                    <strong style={{ color: '#166534' }}>🟢 {h.availableBeds || 0}</strong>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* "WHERE IS STUDENT X" SEARCH BAR */}
-      <div className="card" style={{ padding: '20px', marginBottom: '30px', background: '#f8fafc' }}>
+      <div className="card" style={{ padding: '20px', marginBottom: '30px', background: '#f8fafc', borderRadius: '14px' }}>
         <h4 style={{ color: 'var(--primary-navy)', fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Search size={18} /> Quick Student Bed Location Lookup ("Where is Student X?")
         </h4>
@@ -281,6 +335,8 @@ export default function OccupancyManager() {
             fetchHostels();
             fetchUnallocatedStudents();
           }}
+          onAddFloor={() => setShowAddFloorModal(true)}
+          onAddRoom={() => setShowAddRoomModal(true)}
           unallocatedStudents={unallocatedStudents}
         />
       )}

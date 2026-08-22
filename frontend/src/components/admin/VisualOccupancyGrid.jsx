@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import api from '../../services/api';
-import { UserCheck, LogOut, Wrench, Shield, CheckCircle, Search, AlertCircle, X } from 'lucide-react';
+import { UserCheck, LogOut, Wrench, Shield, CheckCircle, Search, AlertCircle, X, Building2, Plus, Layers, BedDouble } from 'lucide-react';
 
-export default function VisualOccupancyGrid({ floors, hostelId, onRefresh, unallocatedStudents = [] }) {
+export default function VisualOccupancyGrid({ floors = [], hostelId, onRefresh, unallocatedStudents = [], onAddFloor, onAddRoom }) {
   const [selectedBed, setSelectedBed] = useState(null);
   const [assignStudentId, setAssignStudentId] = useState('');
   const [searchStudentTerm, setSearchStudentTerm] = useState('');
@@ -117,16 +117,42 @@ export default function VisualOccupancyGrid({ floors, hostelId, onRefresh, unall
   return (
     <div className="occupancy-grid-container">
       {/* Legend Header */}
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', background: '#ffffff', padding: '14px 20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Bed Status Legend:</span>
-        <span className="badge badge-vacant">🟢 Vacant</span>
-        <span className="badge badge-occupied">🔴 Occupied</span>
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', background: '#ffffff', padding: '14px 20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', marginBottom: '24px' }}>
+        <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--primary-navy)' }}>Bed Status Legend:</span>
+        <span className="badge badge-vacant">🟢 Vacant Bed</span>
+        <span className="badge badge-occupied">🔴 Occupied Bed</span>
         <span className="badge badge-reserved">🟡 Reserved</span>
         <span className="badge badge-maintenance">⚪ Maintenance</span>
       </div>
 
-      {/* Floors Render */}
-      {floors.map((floor) => (
+      {/* Empty State when no floors exist */}
+      {floors.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: '60px 24px', background: '#ffffff', border: '2px dashed #cbd5e1', borderRadius: '16px' }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#2563EB' }}>
+            <Building2 size={40} />
+          </div>
+          <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-navy)', marginBottom: '8px' }}>
+            No Floors or Rooms Set Up for this Hostel Yet
+          </h3>
+          <p style={{ color: 'var(--text-muted)', maxWidth: '520px', margin: '0 auto 24px', fontSize: '0.95rem' }}>
+            Create floors (e.g. Ground Floor, 1st Floor) and add rooms to auto-generate beds and start managing student occupancy.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {onAddFloor && (
+              <button className="btn btn-outline" onClick={onAddFloor}>
+                <Layers size={16} /> Add First Floor
+              </button>
+            )}
+            {onAddRoom && (
+              <button className="btn btn-primary" onClick={onAddRoom}>
+                <Plus size={16} /> Add Room & Generate Beds
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Floors Render */
+        floors.map((floor) => (
         <div key={floor.id} className="floor-card">
           <div className="floor-header">
             <div>
@@ -189,7 +215,8 @@ export default function VisualOccupancyGrid({ floors, hostelId, onRefresh, unall
             ))}
           </div>
         </div>
-      ))}
+        ))
+      )}
 
       {/* Bed Action Side Panel Modal */}
       {selectedBed && (
