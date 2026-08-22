@@ -1,5 +1,6 @@
 const prisma = require('../utils/prisma');
 const { logAudit } = require('../utils/auditLogger');
+const { saveBase64ToFile } = require('../utils/fileHelper');
 
 // --- NEWS ---
 const getNews = async (req, res, next) => {
@@ -15,23 +16,32 @@ const getNews = async (req, res, next) => {
 
 const createNews = async (req, res, next) => {
   try {
-    const { titleGu, titleEn, contentGu, contentEn, featuredImage } = req.body;
+    let { titleGu, titleEn, contentGu, contentEn, featuredImage } = req.body;
+    
+    // Save base64 image to physical file in uploads
+    if (featuredImage) {
+      featuredImage = saveBase64ToFile(featuredImage, 'news');
+    }
+
     const item = await prisma.news.create({
       data: { titleGu, titleEn, contentGu, contentEn, featuredImage },
     });
 
-    await logAudit({
-      adminId: req.admin.id,
-      adminName: req.admin.name,
-      action: 'CREATE_NEWS',
-      entity: 'News',
-      entityId: item.id,
-      details: `Created news item ${titleEn}`,
-      req,
-    });
+    if (req.admin) {
+      await logAudit({
+        adminId: req.admin.id,
+        adminName: req.admin.name,
+        action: 'CREATE_NEWS',
+        entity: 'News',
+        entityId: item.id,
+        details: `Created news item ${titleEn || titleGu}`,
+        req,
+      });
+    }
 
     return res.status(201).json({ success: true, item });
   } catch (error) {
+    console.error('Error creating news:', error);
     next(error);
   }
 };
@@ -39,7 +49,12 @@ const createNews = async (req, res, next) => {
 const updateNews = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { titleGu, titleEn, contentGu, contentEn, featuredImage } = req.body;
+    let { titleGu, titleEn, contentGu, contentEn, featuredImage } = req.body;
+
+    if (featuredImage) {
+      featuredImage = saveBase64ToFile(featuredImage, 'news');
+    }
+
     const item = await prisma.news.update({
       where: { id: parseInt(id, 10) },
       data: { titleGu, titleEn, contentGu, contentEn, featuredImage },
@@ -47,6 +62,7 @@ const updateNews = async (req, res, next) => {
 
     return res.json({ success: true, item });
   } catch (error) {
+    console.error('Error updating news:', error);
     next(error);
   }
 };
@@ -103,7 +119,13 @@ const getCommittee = async (req, res, next) => {
 
 const createCommitteeMember = async (req, res, next) => {
   try {
-    const { nameGu, nameEn, designationGu, designationEn, bioGu, bioEn, photoPath, displayOrder, isActive } = req.body;
+    let { nameGu, nameEn, designationGu, designationEn, bioGu, bioEn, photoPath, displayOrder, isActive } = req.body;
+    
+    // Save base64 photo to physical file in uploads
+    if (photoPath) {
+      photoPath = saveBase64ToFile(photoPath, 'committee');
+    }
+
     const member = await prisma.committeeMember.create({
       data: {
         nameGu,
@@ -120,6 +142,7 @@ const createCommitteeMember = async (req, res, next) => {
 
     return res.status(201).json({ success: true, member });
   } catch (error) {
+    console.error('Error creating committee member:', error);
     next(error);
   }
 };
@@ -127,7 +150,11 @@ const createCommitteeMember = async (req, res, next) => {
 const updateCommitteeMember = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { nameGu, nameEn, designationGu, designationEn, bioGu, bioEn, photoPath, displayOrder, isActive } = req.body;
+    let { nameGu, nameEn, designationGu, designationEn, bioGu, bioEn, photoPath, displayOrder, isActive } = req.body;
+
+    if (photoPath) {
+      photoPath = saveBase64ToFile(photoPath, 'committee');
+    }
 
     const member = await prisma.committeeMember.update({
       where: { id: parseInt(id, 10) },
@@ -146,6 +173,7 @@ const updateCommitteeMember = async (req, res, next) => {
 
     return res.json({ success: true, member });
   } catch (error) {
+    console.error('Error updating committee member:', error);
     next(error);
   }
 };
@@ -177,7 +205,16 @@ const getPublications = async (req, res, next) => {
 
 const createPublication = async (req, res, next) => {
   try {
-    const { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+    let { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+    
+    // Save base64 cover image & PDF document
+    if (coverImage) {
+      coverImage = saveBase64ToFile(coverImage, 'darpan_cover');
+    }
+    if (pdfFile) {
+      pdfFile = saveBase64ToFile(pdfFile, 'darpan_doc');
+    }
+
     const pub = await prisma.publication.create({
       data: {
         titleGu,
@@ -192,6 +229,7 @@ const createPublication = async (req, res, next) => {
 
     return res.status(201).json({ success: true, publication: pub });
   } catch (error) {
+    console.error('Error creating publication:', error);
     next(error);
   }
 };
@@ -199,7 +237,15 @@ const createPublication = async (req, res, next) => {
 const updatePublication = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+    let { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+
+    if (coverImage) {
+      coverImage = saveBase64ToFile(coverImage, 'darpan_cover');
+    }
+    if (pdfFile) {
+      pdfFile = saveBase64ToFile(pdfFile, 'darpan_doc');
+    }
+
     const pub = await prisma.publication.update({
       where: { id: parseInt(id, 10) },
       data: { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished },
@@ -207,6 +253,7 @@ const updatePublication = async (req, res, next) => {
 
     return res.json({ success: true, publication: pub });
   } catch (error) {
+    console.error('Error updating publication:', error);
     next(error);
   }
 };
@@ -253,7 +300,10 @@ const getSettings = async (req, res, next) => {
 const updateSettings = async (req, res, next) => {
   try {
     const settings = req.body; // Expect { key: value, key2: value2 }
-    for (const [key, value] of Object.entries(settings)) {
+    for (let [key, value] of Object.entries(settings)) {
+      if (typeof value === 'string' && value.startsWith('data:')) {
+        value = saveBase64ToFile(value, `setting_${key}`);
+      }
       await prisma.setting.upsert({
         where: { key },
         update: { value: String(value) },
@@ -267,6 +317,7 @@ const updateSettings = async (req, res, next) => {
 
     return res.json({ success: true, settings: map });
   } catch (error) {
+    console.error('Error updating settings:', error);
     next(error);
   }
 };

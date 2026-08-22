@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
-import { Plus, Newspaper, Users, BookOpen, Settings as SettingsIcon, Trash2, Edit3, ArrowUp, ArrowDown, Save, ShieldAlert, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { Plus, Newspaper, Users, BookOpen, Settings as SettingsIcon, Trash2, Edit3, ArrowUp, ArrowDown, Save, ShieldAlert, Upload, FileText, Image as ImageIcon, Check, Loader2, X } from 'lucide-react';
 
 export default function ContentManager() {
   const [activeTab, setActiveTab] = useState('admission');
@@ -9,12 +9,14 @@ export default function ContentManager() {
   const [newsList, setNewsList] = useState([]);
   const [showNewsModal, setShowNewsModal] = useState(false);
   const [editingNewsId, setEditingNewsId] = useState(null);
+  const [savingNews, setSavingNews] = useState(false);
   const [newsForm, setNewsForm] = useState({ titleGu: '', titleEn: '', contentGu: '', contentEn: '', featuredImage: '' });
 
   // Committee State
   const [committeeList, setCommitteeList] = useState([]);
   const [showCommitteeModal, setShowCommitteeModal] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState(null);
+  const [savingCommittee, setSavingCommittee] = useState(false);
   const [committeeForm, setCommitteeForm] = useState({
     nameGu: '',
     nameEn: '',
@@ -31,6 +33,7 @@ export default function ContentManager() {
   const [darpanList, setDarpanList] = useState([]);
   const [showDarpanModal, setShowDarpanModal] = useState(false);
   const [editingDarpanId, setEditingDarpanId] = useState(null);
+  const [savingDarpan, setSavingDarpan] = useState(false);
   const [darpanForm, setDarpanForm] = useState({
     titleGu: '',
     titleEn: '',
@@ -87,15 +90,56 @@ export default function ContentManager() {
     }
   };
 
-  // Helper for reading local files as DataURL
+  // Helper for reading local files as DataURL with optional image compression
   const handleFileSelect = (e, callback) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      callback(reader.result);
-    };
-    reader.readAsDataURL(file);
+
+    // If it's an image, optimize and resize to max 1200px for speed
+    if (file.type.startsWith('image/') && !file.type.includes('svg')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxWidth = 1200;
+          const maxHeight = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Get compressed JPEG or WebP data URL
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          callback(compressedDataUrl);
+        };
+        img.onerror = () => {
+          callback(event.target.result);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // For PDFs or other documents, read directly
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        callback(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // --- SETTINGS HANDLERS ---
@@ -108,7 +152,7 @@ export default function ContentManager() {
         alert('Site & Admission Settings saved successfully!');
       }
     } catch (err) {
-      alert('Failed to save settings.');
+      alert(err.response?.data?.message || 'Failed to save settings.');
     } finally {
       setSavingSettings(false);
     }
@@ -117,19 +161,23 @@ export default function ContentManager() {
   // --- COMMITTEE HANDLERS ---
   const handleSaveCommitteeMember = async (e) => {
     e.preventDefault();
+    setSavingCommittee(true);
     try {
       if (editingMemberId) {
         await api.put(`/cms/committee/${editingMemberId}`, committeeForm);
-        alert('Committee member updated!');
+        alert('Committee member updated successfully!');
       } else {
         await api.post('/cms/committee', committeeForm);
-        alert('Committee member added!');
+        alert('Committee member added successfully!');
       }
       setShowCommitteeModal(false);
       resetCommitteeForm();
       fetchAllData();
     } catch (err) {
-      alert('Failed to save committee member.');
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to save committee member.');
+    } finally {
+      setSavingCommittee(false);
     }
   };
 
@@ -186,19 +234,23 @@ export default function ContentManager() {
   // --- DARPAN HANDLERS ---
   const handleSaveDarpan = async (e) => {
     e.preventDefault();
+    setSavingDarpan(true);
     try {
       if (editingDarpanId) {
         await api.put(`/cms/publications/${editingDarpanId}`, darpanForm);
-        alert('Darpan publication updated!');
+        alert('Darpan publication updated successfully!');
       } else {
         await api.post('/cms/publications', darpanForm);
-        alert('Darpan publication created!');
+        alert('Darpan publication created successfully!');
       }
       setShowDarpanModal(false);
       resetDarpanForm();
       fetchAllData();
     } catch (err) {
-      alert('Failed to save publication.');
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to save publication.');
+    } finally {
+      setSavingDarpan(false);
     }
   };
 
@@ -242,19 +294,23 @@ export default function ContentManager() {
   // --- NEWS HANDLERS (WITH DELETE & EDIT) ---
   const handleSaveNews = async (e) => {
     e.preventDefault();
+    setSavingNews(true);
     try {
       if (editingNewsId) {
         await api.put(`/cms/news/${editingNewsId}`, newsForm);
-        alert('News announcement updated!');
+        alert('News announcement updated successfully!');
       } else {
         await api.post('/cms/news', newsForm);
-        alert('News announcement published!');
+        alert('News announcement published successfully!');
       }
       setShowNewsModal(false);
       resetNewsForm();
       fetchAllData();
     } catch (err) {
-      alert('Failed to save news.');
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to save news.');
+    } finally {
+      setSavingNews(false);
     }
   };
 
@@ -854,7 +910,7 @@ export default function ContentManager() {
         </div>
       )}
 
-      {/* COMMITTEE MODAL (WITH FILE UPLOAD) */}
+      {/* COMMITTEE MODAL (WITH FILE UPLOAD & PREVIEW) */}
       {showCommitteeModal && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '650px' }}>
@@ -901,6 +957,17 @@ export default function ContentManager() {
                     className="form-control"
                     onChange={(e) => handleFileSelect(e, (base64) => setCommitteeForm({ ...committeeForm, photoPath: base64 }))}
                   />
+                  {committeeForm.photoPath && (
+                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', padding: '6px 10px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <img src={committeeForm.photoPath} alt="Preview" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <span style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 'bold' }}>✓ Photo Ready</span>
+                      </div>
+                      <button type="button" onClick={() => setCommitteeForm({ ...committeeForm, photoPath: '' })} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem' }}>
+                        Remove
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -910,15 +977,17 @@ export default function ContentManager() {
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowCommitteeModal(false)} style={{ flex: 1 }}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Member</button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowCommitteeModal(false)} disabled={savingCommittee} style={{ flex: 1 }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={savingCommittee} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  {savingCommittee ? <><Loader2 className="animate-spin" size={16} /> Saving Member...</> : (editingMemberId ? 'Update Member' : 'Save Member')}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* DARPAN MODAL (WITH FILE UPLOADS) */}
+      {/* DARPAN MODAL (WITH FILE UPLOADS & PREVIEW) */}
       {showDarpanModal && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '650px' }}>
@@ -929,7 +998,7 @@ export default function ContentManager() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div className="form-group">
                   <label className="form-label">Title (English) *</label>
-                  <input type="text" className="form-control" placeholder="e.g. Satvara Darpan - August 2026" value={darpanForm.titleEn} onChange={(e) => setDarpanForm({ ...darpanForm, titleEn: e.target.value, titleGu: e.target.value })} required />
+                  <input type="text" className="form-control" placeholder="e.g. Satvara Darpan - August 2026" value={darpanForm.titleEn} onChange={(e) => setDarpanForm({ ...darpanForm, titleEn: e.target.value, titleGu: darpanForm.titleGu || e.target.value })} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Title (Gujarati)</label>
@@ -960,8 +1029,14 @@ export default function ContentManager() {
                   onChange={(e) => handleFileSelect(e, (base64) => setDarpanForm({ ...darpanForm, coverImage: base64 }))}
                 />
                 {darpanForm.coverImage && (
-                  <div style={{ marginTop: '8px', fontSize: '0.8rem', color: 'green', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Check size={14} /> Image File Loaded
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', padding: '6px 10px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img src={darpanForm.coverImage} alt="Cover Preview" style={{ width: '28px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                      <span style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 'bold' }}>✓ Cover Image Ready</span>
+                    </div>
+                    <button type="button" onClick={() => setDarpanForm({ ...darpanForm, coverImage: '' })} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem' }}>
+                      Remove
+                    </button>
                   </div>
                 )}
               </div>
@@ -978,22 +1053,27 @@ export default function ContentManager() {
                   onChange={(e) => handleFileSelect(e, (base64) => setDarpanForm({ ...darpanForm, pdfFile: base64 }))}
                 />
                 {darpanForm.pdfFile && (
-                  <div style={{ marginTop: '8px', fontSize: '0.8rem', color: 'green', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Check size={14} /> PDF File Loaded
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#eff6ff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #bfdbfe' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#1d4ed8', fontWeight: 'bold' }}>✓ PDF Document File Attached</span>
+                    <button type="button" onClick={() => setDarpanForm({ ...darpanForm, pdfFile: '' })} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem' }}>
+                      Remove
+                    </button>
                   </div>
                 )}
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowDarpanModal(false)} style={{ flex: 1 }}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Issue</button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowDarpanModal(false)} disabled={savingDarpan} style={{ flex: 1 }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={savingDarpan} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  {savingDarpan ? <><Loader2 className="animate-spin" size={16} /> Saving Issue...</> : (editingDarpanId ? 'Update Issue' : 'Save Issue')}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* NEWS MODAL (WITH FILE UPLOAD) */}
+      {/* NEWS MODAL (WITH FILE UPLOAD & PREVIEW) */}
       {showNewsModal && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '600px' }}>
@@ -1003,7 +1083,7 @@ export default function ContentManager() {
             <form onSubmit={handleSaveNews}>
               <div className="form-group">
                 <label className="form-label">Title (English) *</label>
-                <input type="text" className="form-control" value={newsForm.titleEn} onChange={(e) => setNewsForm({ ...newsForm, titleEn: e.target.value, titleGu: e.target.value })} required />
+                <input type="text" className="form-control" value={newsForm.titleEn} onChange={(e) => setNewsForm({ ...newsForm, titleEn: e.target.value, titleGu: newsForm.titleGu || e.target.value })} required />
               </div>
               <div className="form-group">
                 <label className="form-label">Title (Gujarati)</label>
@@ -1024,11 +1104,24 @@ export default function ContentManager() {
                   className="form-control"
                   onChange={(e) => handleFileSelect(e, (base64) => setNewsForm({ ...newsForm, featuredImage: base64 }))}
                 />
+                {newsForm.featuredImage && (
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', padding: '6px 10px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img src={newsForm.featuredImage} alt="News Preview" style={{ width: '40px', height: '30px', objectFit: 'cover', borderRadius: '4px' }} />
+                      <span style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 'bold' }}>✓ Image Ready</span>
+                    </div>
+                    <button type="button" onClick={() => setNewsForm({ ...newsForm, featuredImage: '' })} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem' }}>
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowNewsModal(false)} style={{ flex: 1 }}>Cancel</button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save News</button>
+                <button type="button" className="btn btn-outline" onClick={() => setShowNewsModal(false)} disabled={savingNews} style={{ flex: 1 }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={savingNews} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  {savingNews ? <><Loader2 className="animate-spin" size={16} /> Saving News...</> : (editingNewsId ? 'Update News' : 'Save News')}
+                </button>
               </div>
             </form>
           </div>

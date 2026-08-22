@@ -24,7 +24,12 @@ export default function NewsPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
         {news.map((item) => (
-          <div key={item.id} className="card card-hover">
+          <div key={item.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
+            {item.featuredImage && (
+              <div style={{ height: '180px', borderRadius: '10px', overflow: 'hidden', marginBottom: '14px', background: '#f1f5f9' }}>
+                <img src={item.featuredImage} alt={lang === 'gu' ? item.titleGu : item.titleEn} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            )}
             <div style={{ fontSize: '0.82rem', color: 'var(--accent-gold)', fontWeight: 700, marginBottom: '8px' }}>
               <Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />
               {new Date(item.publishedDate).toLocaleDateString(lang === 'gu' ? 'gu-IN' : 'en-IN')}
@@ -32,7 +37,7 @@ export default function NewsPage() {
             <h3 style={{ fontSize: '1.2rem', color: 'var(--primary-navy)', marginBottom: '12px' }}>
               {lang === 'gu' ? item.titleGu : item.titleEn}
             </h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, flex: 1 }}>
               {lang === 'gu' ? item.contentGu : item.contentEn}
             </p>
           </div>

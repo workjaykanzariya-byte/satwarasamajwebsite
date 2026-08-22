@@ -395,8 +395,8 @@ model News {
   titleEn       String   @db.Text
   contentGu     String   @db.Text
   contentEn     String   @db.Text
-  featuredImage String?
-  pdfAttachment String?
+  featuredImage String?  @db.LongText
+  pdfAttachment String?  @db.LongText
   isPublished   Boolean  @default(true)
   publishedDate DateTime @default(now())
   createdAt     DateTime @default(now())
@@ -408,8 +408,8 @@ model Publication {
   titleEn     String
   month       String
   year        String
-  coverImage  String?
-  pdfFile     String
+  coverImage  String?  @db.LongText
+  pdfFile     String   @db.LongText
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
@@ -418,7 +418,7 @@ model GalleryAlbum {
   id         Int           @id @default(autoincrement())
   titleGu    String
   titleEn    String
-  coverImage String?
+  coverImage String?       @db.LongText
   eventDate  DateTime?
   createdAt  DateTime      @default(now())
 
@@ -429,7 +429,7 @@ model GalleryItem {
   id        Int          @id @default(autoincrement())
   albumId   Int
   itemType  String       @default("PHOTO")
-  filePath  String?
+  filePath  String?      @db.LongText
   videoUrl  String?
   caption   String?
 
@@ -441,7 +441,7 @@ model Download {
   titleGu       String
   titleEn       String
   category      String   @default("NOTICES")
-  filePath      String
+  filePath      String   @db.LongText
   fileSize      String?  @default("1.2 MB")
   publishedDate DateTime @default(now())
 }
@@ -454,7 +454,7 @@ model CommitteeMember {
   designationEn String
   bioGu         String? @db.Text
   bioEn         String? @db.Text
-  photoPath     String?
+  photoPath     String? @db.LongText
   displayOrder  Int     @default(0)
   isActive      Boolean @default(true)
   termPeriod    String? @default("2024-2027")
@@ -473,7 +473,7 @@ model Page {
 model Setting {
   id    Int    @id @default(autoincrement())
   key   String @unique
-  value String @db.Text
+  value String @db.LongText
 }
 
 model Enquiry {
