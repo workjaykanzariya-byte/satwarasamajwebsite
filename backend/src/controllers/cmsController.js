@@ -1,13 +1,18 @@
 const prisma = require('../utils/prisma');
 const { logAudit } = require('../utils/auditLogger');
-const { saveBase64ToFile } = require('../utils/fileHelper');
+const { saveBase64ToFile, formatMediaUrl } = require('../utils/fileHelper');
 
 // --- NEWS ---
 const getNews = async (req, res, next) => {
   try {
-    const news = await prisma.news.findMany({
+    const rawNews = await prisma.news.findMany({
       orderBy: { publishedDate: 'desc' },
     });
+    const news = rawNews.map((n) => ({
+      ...n,
+      featuredImage: formatMediaUrl(n.featuredImage),
+      pdfAttachment: formatMediaUrl(n.pdfAttachment),
+    }));
     return res.json({ success: true, news });
   } catch (error) {
     next(error);
@@ -108,9 +113,13 @@ const getDownloads = async (req, res, next) => {
 // --- COMMITTEE MEMBERS ---
 const getCommittee = async (req, res, next) => {
   try {
-    const members = await prisma.committeeMember.findMany({
+    const rawMembers = await prisma.committeeMember.findMany({
       orderBy: { displayOrder: 'asc' },
     });
+    const members = rawMembers.map((m) => ({
+      ...m,
+      photoPath: formatMediaUrl(m.photoPath),
+    }));
     return res.json({ success: true, members });
   } catch (error) {
     next(error);
@@ -194,9 +203,14 @@ const deleteCommitteeMember = async (req, res, next) => {
 // --- PUBLICATIONS (DARPAN) ---
 const getPublications = async (req, res, next) => {
   try {
-    const publications = await prisma.publication.findMany({
+    const rawPublications = await prisma.publication.findMany({
       orderBy: { createdAt: 'desc' },
     });
+    const publications = rawPublications.map((p) => ({
+      ...p,
+      coverImage: formatMediaUrl(p.coverImage),
+      pdfFile: formatMediaUrl(p.pdfFile),
+    }));
     return res.json({ success: true, publications });
   } catch (error) {
     next(error);
@@ -290,7 +304,13 @@ const getSettings = async (req, res, next) => {
   try {
     const settings = await prisma.setting.findMany();
     const map = {};
-    settings.forEach((s) => (map[s.key] = s.value));
+    settings.forEach((s) => {
+      if (s.key.includes('photo') || s.key.includes('image') || s.key.includes('file') || s.key.includes('qr')) {
+        map[s.key] = formatMediaUrl(s.value);
+      } else {
+        map[s.key] = s.value;
+      }
+    });
     return res.json({ success: true, settings: map });
   } catch (error) {
     next(error);
@@ -384,6 +404,26 @@ const getEnquiries = async (req, res, next) => {
   }
 };
 
+// --- GENERAL MEDIA FILE UPLOAD (FOR HIGH-RES IMAGES & LARGE PDFS) ---
+const uploadMediaFile = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file was uploaded.' });
+    }
+    const fileUrl = `/api/v1/uploads/${req.file.filename}`;
+    return res.json({
+      success: true,
+      message: 'File uploaded successfully.',
+      fileUrl,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+    });
+  } catch (error) {
+    console.error('Upload media file error:', error);
+    next(error);
+  }
+};
+
 module.exports = {
   getNews,
   createNews,
@@ -403,6 +443,8 @@ module.exports = {
   getSettings,
   updateSettings,
   uploadQRCode,
+  uploadMediaFile,
   createEnquiry,
   getEnquiries,
 };
+

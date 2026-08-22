@@ -18,6 +18,7 @@ const {
   getSettings,
   updateSettings,
   uploadQRCode,
+  uploadMediaFile,
   createEnquiry,
   getEnquiries,
 } = require('../controllers/cmsController');
@@ -25,6 +26,9 @@ const { authenticateAdmin, authorizeRoles } = require('../middleware/authMiddlew
 const upload = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
+
+// General Media File Upload (up to 100MB for Magazine PDFs and High-Res Images)
+router.post('/upload', authenticateAdmin, upload.single('file'), uploadMediaFile);
 
 // Public CMS Routes
 router.get('/news', getNews);

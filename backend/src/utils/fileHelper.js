@@ -9,19 +9,37 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 /**
+ * Formats a media path to ensure it uses the accessible /api/v1/uploads prefix
+ */
+const formatMediaUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const clean = url.startsWith('/') ? url : `/${url}`;
+  if (clean.startsWith('/api/v1/uploads/')) {
+    return clean;
+  }
+  if (clean.startsWith('/uploads/')) {
+    return `/api/v1${clean}`;
+  }
+  return clean;
+};
+
+/**
  * Checks if a string is a base64 DataURL and saves it to the uploads folder as a physical file.
- * Returns the relative static URL path (/uploads/filename.ext) or the original string if not base64.
+ * Returns the accessible URL path (/api/v1/uploads/filename.ext) or the formatted string if not base64.
  *
  * @param {string} base64Str Base64 Data URL or standard URL
  * @param {string} prefix Prefix for the saved file name (e.g. 'committee', 'news', 'darpan')
- * @returns {string|null} Saved relative URL path or original string
+ * @returns {string|null} Saved relative URL path or formatted string
  */
 const saveBase64ToFile = (base64Str, prefix = 'file') => {
   if (!base64Str || typeof base64Str !== 'string') return base64Str;
   
-  // If it doesn't start with data:, it's already a URL or path
+  // If it doesn't start with data:, format and return
   if (!base64Str.startsWith('data:')) {
-    return base64Str;
+    return formatMediaUrl(base64Str);
   }
 
   try {
@@ -49,7 +67,7 @@ const saveBase64ToFile = (base64Str, prefix = 'file') => {
     const buffer = Buffer.from(base64Data, 'base64');
     fs.writeFileSync(filePath, buffer);
 
-    return `/uploads/${fileName}`;
+    return `/api/v1/uploads/${fileName}`;
   } catch (err) {
     console.error(`Failed to save base64 file for prefix [${prefix}]:`, err);
     return base64Str;
@@ -58,4 +76,5 @@ const saveBase64ToFile = (base64Str, prefix = 'file') => {
 
 module.exports = {
   saveBase64ToFile,
+  formatMediaUrl,
 };

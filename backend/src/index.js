@@ -42,9 +42,9 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-// Body Parser
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Body Parser (allow up to 200MB for large publication magazine PDFs and high-res media)
+app.use(express.json({ limit: '200mb' }));
+app.use(express.urlencoded({ extended: true, limit: '200mb' }));
 
 // Health Check
 app.get('/api/v1/health', (req, res) => {

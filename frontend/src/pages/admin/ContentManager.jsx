@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Plus, Newspaper, Users, BookOpen, Settings as SettingsIcon, Trash2, Edit3, ArrowUp, ArrowDown, Save, ShieldAlert, Upload, FileText, Image as ImageIcon, Check, Loader2, X } from 'lucide-react';
+import { getMediaUrl, DEFAULT_DARPAN_COVER } from '../../utils/mediaHelper';
 
 export default function ContentManager() {
   const [activeTab, setActiveTab] = useState('admission');
@@ -34,6 +35,7 @@ export default function ContentManager() {
   const [showDarpanModal, setShowDarpanModal] = useState(false);
   const [editingDarpanId, setEditingDarpanId] = useState(null);
   const [savingDarpan, setSavingDarpan] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
   const [darpanForm, setDarpanForm] = useState({
     titleGu: '',
     titleEn: '',
@@ -90,10 +92,31 @@ export default function ContentManager() {
     }
   };
 
-  // Helper for reading local files as DataURL with optional image compression
-  const handleFileSelect = (e, callback) => {
+  // Helper for reading or directly uploading files with auto-detection
+  const handleFileSelect = async (e, callback, onUploadingChange = null) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // For PDF documents or files > 1MB, upload directly via multipart form to avoid JSON payload size limits
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf') || file.size > 1024 * 1024) {
+      if (onUploadingChange) onUploadingChange(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await api.post('/cms/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (res.data.success && res.data.fileUrl) {
+          callback(res.data.fileUrl);
+          if (onUploadingChange) onUploadingChange(false);
+          return;
+        }
+      } catch (uploadErr) {
+        console.warn('Direct multipart upload failed, falling back to base64 reader:', uploadErr);
+      } finally {
+        if (onUploadingChange) onUploadingChange(false);
+      }
+    }
 
     // If it's an image, optimize and resize to max 1200px for speed
     if (file.type.startsWith('image/') && !file.type.includes('svg')) {
@@ -747,7 +770,7 @@ export default function ContentManager() {
           </div>
 
           <button type="submit" className="btn btn-primary btn-lg" disabled={savingSettings} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <Save size={18} /> {savingSettings ? 'Saving Settings...' : 'Save All Settings'}
+            {savingSettings ? <><Loader2 className="animate-spin" size={18} /> Saving Settings...</> : <><Save size={18} /> Save All Settings</>}
           </button>
         </form>
       )}
@@ -842,7 +865,15 @@ export default function ContentManager() {
                 <div>
                   <div style={{ height: '140px', background: '#f1f5f9', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {d.coverImage ? (
-                      <img src={d.coverImage} alt={d.titleEn || d.titleGu} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img
+                        src={getMediaUrl(d.coverImage) || DEFAULT_DARPAN_COVER}
+                        alt={d.titleEn || d.titleGu}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = DEFAULT_DARPAN_COVER;
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     ) : (
                       <BookOpen size={48} color="var(--primary-navy)" />
                     )}
@@ -1050,9 +1081,15 @@ export default function ContentManager() {
                   type="file"
                   accept=".pdf,application/pdf"
                   className="form-control"
-                  onChange={(e) => handleFileSelect(e, (base64) => setDarpanForm({ ...darpanForm, pdfFile: base64 }))}
+                  disabled={uploadingPdf}
+                  onChange={(e) => handleFileSelect(e, (urlOrBase64) => setDarpanForm({ ...darpanForm, pdfFile: urlOrBase64 }), setUploadingPdf)}
                 />
-                {darpanForm.pdfFile && (
+                {uploadingPdf && (
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', background: '#fef3c7', padding: '6px 10px', borderRadius: '6px', border: '1px solid #fde047', color: '#b45309', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                    <Loader2 className="animate-spin" size={16} /> Attaching & Uploading PDF File (Please wait)...
+                  </div>
+                )}
+                {!uploadingPdf && darpanForm.pdfFile && (
                   <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#eff6ff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #bfdbfe' }}>
                     <span style={{ fontSize: '0.8rem', color: '#1d4ed8', fontWeight: 'bold' }}>✓ PDF Document File Attached</span>
                     <button type="button" onClick={() => setDarpanForm({ ...darpanForm, pdfFile: '' })} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem' }}>
@@ -1063,8 +1100,8 @@ export default function ContentManager() {
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                <button type="button" className="btn btn-outline" onClick={() => setShowDarpanModal(false)} disabled={savingDarpan} style={{ flex: 1 }}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={savingDarpan} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowDarpanModal(false)} disabled={savingDarpan || uploadingPdf} style={{ flex: 1 }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={savingDarpan || uploadingPdf} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   {savingDarpan ? <><Loader2 className="animate-spin" size={16} /> Saving Issue...</> : (editingDarpanId ? 'Update Issue' : 'Save Issue')}
                 </button>
               </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 import { User, Award } from 'lucide-react';
+import { getMediaUrl } from '../../utils/mediaHelper';
 
 export default function Committee() {
   const { language } = useLanguage();
@@ -45,7 +46,7 @@ export default function Committee() {
       msgGu: leadershipSettings.president_msg_gu || 'પ્રિય સમાજજનો, સમસ્ત સતવારા મહામંડળ સમાજના વિકાસ અને વિદ્યાર્થીઓના ઉજ્જવળ ભવિષ્ય માટે સતત કાર્યરત છે.',
       color: '#F59E0B',
       avatar: '👨‍💼',
-      photo: leadershipSettings.president_photo,
+      photo: getMediaUrl(leadershipSettings.president_photo),
     },
     {
       titleGu: leadershipSettings.secretary_title_gu || 'મહામંત્રીશ્રીની કલમે',
@@ -55,7 +56,7 @@ export default function Committee() {
       msgGu: leadershipSettings.secretary_msg_gu || 'વિશ્વભરમાં વસતા સતવારાનું ગૌરવ બનેલી આપણી સંસ્થા નવા સમય સાથે પરંપરાને જાળવીને આગળ વધી રહી છે.',
       color: '#0284C7',
       avatar: '🖋️',
-      photo: leadershipSettings.secretary_photo,
+      photo: getMediaUrl(leadershipSettings.secretary_photo),
     },
   ];
 
@@ -131,7 +132,14 @@ export default function Committee() {
                 <div key={m.id} className="card card-hover" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px', background: '#FFFFFF', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
                   <div style={{ width: '88px', height: '88px', borderRadius: '50%', background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFD700', marginBottom: '16px', border: '3px solid #F59E0B', boxShadow: '0 6px 16px rgba(0,0,0,0.12)', overflow: 'hidden' }}>
                     {m.photoPath ? (
-                      <img src={m.photoPath} alt={m.nameGu} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img
+                        src={getMediaUrl(m.photoPath)}
+                        alt={m.nameGu}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     ) : (
                       <User size={48} />
                     )}

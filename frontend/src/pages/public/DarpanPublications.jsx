@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 import { BookOpen, Download, ExternalLink, Sparkles, Library } from 'lucide-react';
+import { getMediaUrl, DEFAULT_DARPAN_COVER } from '../../utils/mediaHelper';
 
 const samplePublications = [
   {
@@ -14,7 +15,7 @@ const samplePublications = [
     yearGu: '૨૦૨૬',
     descGu: 'આ અંકમાં સતવારા જ્ઞાતિ મંડળ સુરત આયોજિત ઉર્મી ગૌરવ સ્નેહમિલન તથા સિદ્ધનાથ મહાદેવ ધર્માદા ટ્રસ્ટ વિરમગામ આયોજિત સામેયા મહોત્સવ સમાજના સમાચાર, કાર્યક્રમો.',
     descEn: 'This issue covers community news and highlights from the Satvara Gnati Mandal Surat Urmi Gaurav Sneh Milan and the Siddhnath Mahadev Dharmada Trust Viramgam Sameya Mahotsav.',
-    coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+    coverImage: DEFAULT_DARPAN_COVER,
     pdfFile: '/documents/darpan-august-2026.pdf',
   },
   {
@@ -100,6 +101,9 @@ export default function DarpanPublications() {
   const latestIssue = publications.length > 0 ? publications[0] : samplePublications[0];
   const pastIssues = publications.length > 1 ? publications.slice(1) : samplePublications.slice(1);
 
+  const latestCover = getMediaUrl(latestIssue?.coverImage) || DEFAULT_DARPAN_COVER;
+  const latestPdf = getMediaUrl(latestIssue?.pdfFile) || '/documents/sample.pdf';
+
   return (
     <div style={{ background: '#F8FAFC', minHeight: '100vh', paddingBottom: '80px' }}>
       
@@ -117,7 +121,7 @@ export default function DarpanPublications() {
 
       <div className="container" style={{ marginTop: '40px' }}>
 
-        {/* 1. LATEST ISSUE SECTION ("Current Issue" - Screenshot 4) */}
+        {/* 1. LATEST ISSUE SECTION */}
         {latestIssue && (
           <div style={{ marginBottom: '50px' }}>
             <div className="card" style={{ background: '#FFFFFF', padding: '36px', borderRadius: '20px', boxShadow: '0 12px 35px rgba(0,0,0,0.05)', border: '1px solid #E2E8F0', maxWidth: '860px', margin: '0 auto' }}>
@@ -129,10 +133,14 @@ export default function DarpanPublications() {
 
               <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '36px', alignItems: 'center' }}>
                 {/* Magazine Cover Image Preview Frame */}
-                <div style={{ width: '220px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 24px rgba(0,0,0,0.18)', border: '4px solid #1E3A8A', margin: '0 auto' }}>
+                <div style={{ width: '220px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 24px rgba(0,0,0,0.18)', border: '4px solid #1E3A8A', margin: '0 auto', background: '#e2e8f0', minHeight: '300px' }}>
                   <img
-                    src={latestIssue.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'}
+                    src={latestCover}
                     alt={latestIssue.titleEn || latestIssue.titleGu}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = DEFAULT_DARPAN_COVER;
+                    }}
                     style={{ width: '100%', height: '300px', objectFit: 'cover', display: 'block' }}
                   />
                 </div>
@@ -152,7 +160,7 @@ export default function DarpanPublications() {
                   </p>
 
                   <a
-                    href={latestIssue.pdfFile || '/documents/sample.pdf'}
+                    href={latestPdf}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn"
@@ -171,7 +179,7 @@ export default function DarpanPublications() {
                       textDecoration: 'none',
                     }}
                   >
-                    <Download size={20} /> PDF Download
+                    <Download size={20} /> PDF Download / View
                   </a>
                 </div>
               </div>
@@ -179,7 +187,7 @@ export default function DarpanPublications() {
           </div>
         )}
 
-        {/* 2. PAST ISSUES ARCHIVE SECTION ("Past Issues" - Screenshot 5) */}
+        {/* 2. PAST ISSUES ARCHIVE SECTION */}
         <div>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2 style={{ fontSize: '1.8rem', color: '#0F172A', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
@@ -215,7 +223,7 @@ export default function DarpanPublications() {
 
                 <div>
                   <a
-                    href={issue.pdfFile || '/documents/sample.pdf'}
+                    href={getMediaUrl(issue.pdfFile) || '/documents/sample.pdf'}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{

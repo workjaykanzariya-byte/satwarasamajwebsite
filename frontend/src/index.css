@@ -143,6 +143,29 @@ a:hover {
   font-size: 1.05rem;
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* Spin Animations for Loaders */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 0.9s linear infinite !important;
+  display: inline-block;
+  transform-origin: center center;
+}
+
 /* Container & Layout */
 .container {
   width: 100%;

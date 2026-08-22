@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 import { Calendar } from 'lucide-react';
+import { getMediaUrl } from '../../utils/mediaHelper';
 
 export default function NewsPage() {
   const { t, lang } = useLanguage();
@@ -27,7 +28,14 @@ export default function NewsPage() {
           <div key={item.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
             {item.featuredImage && (
               <div style={{ height: '180px', borderRadius: '10px', overflow: 'hidden', marginBottom: '14px', background: '#f1f5f9' }}>
-                <img src={item.featuredImage} alt={lang === 'gu' ? item.titleGu : item.titleEn} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img
+                  src={getMediaUrl(item.featuredImage)}
+                  alt={lang === 'gu' ? item.titleGu : item.titleEn}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
             )}
             <div style={{ fontSize: '0.82rem', color: 'var(--accent-gold)', fontWeight: 700, marginBottom: '8px' }}>
