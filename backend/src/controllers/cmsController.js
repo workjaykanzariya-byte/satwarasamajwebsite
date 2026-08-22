@@ -204,12 +204,16 @@ const deleteCommitteeMember = async (req, res, next) => {
 const getPublications = async (req, res, next) => {
   try {
     const rawPublications = await prisma.publication.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { displayOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
     });
     const publications = rawPublications.map((p) => ({
       ...p,
       coverImage: formatMediaUrl(p.coverImage),
       pdfFile: formatMediaUrl(p.pdfFile),
+      displayOrder: p.displayOrder !== undefined ? p.displayOrder : 1,
     }));
     return res.json({ success: true, publications });
   } catch (error) {
@@ -219,7 +223,7 @@ const getPublications = async (req, res, next) => {
 
 const createPublication = async (req, res, next) => {
   try {
-    let { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+    let { titleGu, titleEn, month, year, coverImage, pdfFile, displayOrder, isPublished } = req.body;
     
     // Save base64 cover image & PDF document
     if (coverImage) {
@@ -237,6 +241,7 @@ const createPublication = async (req, res, next) => {
         year,
         coverImage,
         pdfFile: pdfFile || '/documents/sample.pdf',
+        displayOrder: displayOrder !== undefined ? parseInt(displayOrder, 10) : 1,
         isPublished: isPublished !== undefined ? Boolean(isPublished) : true,
       },
     });
@@ -251,7 +256,7 @@ const createPublication = async (req, res, next) => {
 const updatePublication = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished } = req.body;
+    let { titleGu, titleEn, month, year, coverImage, pdfFile, displayOrder, isPublished } = req.body;
 
     if (coverImage) {
       coverImage = saveBase64ToFile(coverImage, 'darpan_cover');
@@ -262,7 +267,16 @@ const updatePublication = async (req, res, next) => {
 
     const pub = await prisma.publication.update({
       where: { id: parseInt(id, 10) },
-      data: { titleGu, titleEn, month, year, coverImage, pdfFile, isPublished },
+      data: {
+        titleGu,
+        titleEn,
+        month,
+        year,
+        coverImage,
+        pdfFile,
+        displayOrder: displayOrder !== undefined ? parseInt(displayOrder, 10) : undefined,
+        isPublished,
+      },
     });
 
     return res.json({ success: true, publication: pub });

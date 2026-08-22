@@ -98,8 +98,14 @@ export default function DarpanPublications() {
     }).catch(() => {});
   }, []);
 
-  const latestIssue = publications.length > 0 ? publications[0] : samplePublications[0];
-  const pastIssues = publications.length > 1 ? publications.slice(1) : samplePublications.slice(1);
+  const sortedPublications = [...publications].sort((a, b) => {
+    const orderA = a.displayOrder !== undefined ? Number(a.displayOrder) : 999;
+    const orderB = b.displayOrder !== undefined ? Number(b.displayOrder) : 999;
+    return orderA - orderB;
+  });
+
+  const latestIssue = sortedPublications.length > 0 ? sortedPublications[0] : samplePublications[0];
+  const pastIssues = sortedPublications.length > 1 ? sortedPublications.slice(1) : samplePublications.slice(1);
 
   const latestCover = getMediaUrl(latestIssue?.coverImage) || DEFAULT_DARPAN_COVER;
   const latestPdf = getMediaUrl(latestIssue?.pdfFile) || '/documents/sample.pdf';

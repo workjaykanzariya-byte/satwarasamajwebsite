@@ -43,6 +43,7 @@ export default function ContentManager() {
     year: '2026',
     coverImage: '',
     pdfFile: '',
+    displayOrder: 1,
     isPublished: true,
   });
 
@@ -345,9 +346,19 @@ export default function ContentManager() {
       year: d.year,
       coverImage: d.coverImage || '',
       pdfFile: d.pdfFile || '',
+      displayOrder: d.displayOrder || 1,
       isPublished: d.isPublished,
     });
     setShowDarpanModal(true);
+  };
+
+  const handleDarpanOrderChange = async (darpan, newOrder) => {
+    try {
+      await api.put(`/cms/publications/${darpan.id}`, { displayOrder: Math.max(1, newOrder) });
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDeleteDarpan = async (id) => {
@@ -369,6 +380,7 @@ export default function ContentManager() {
       year: '2026',
       coverImage: '',
       pdfFile: '',
+      displayOrder: darpanList.length + 1,
       isPublished: true,
     });
   };
@@ -922,11 +934,44 @@ export default function ContentManager() {
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-            {darpanList.map((d) => (
-              <div key={d.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+            {[...darpanList].sort((a, b) => (Number(a.displayOrder || 999) - Number(b.displayOrder || 999))).map((d, index) => (
+              <div key={d.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderTop: d.displayOrder === 1 ? '4px solid #F59E0B' : '4px solid #3B82F6', position: 'relative' }}>
                 <div>
-                  <div style={{ height: '140px', background: '#f1f5f9', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      background: d.displayOrder === 1 ? '#FEF3C7' : '#EFF6FF',
+                      color: d.displayOrder === 1 ? '#B45309' : '#1D4ED8',
+                      border: d.displayOrder === 1 ? '1px solid #FDE047' : '1px solid #BFDBFE'
+                    }}>
+                      {d.displayOrder === 1 ? '🌟 Order #1 (Current Main Issue)' : `#${d.displayOrder || index + 1} (Past Archive)`}
+                    </span>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        style={{ padding: '2px 6px', fontSize: '0.75rem' }}
+                        disabled={d.displayOrder <= 1}
+                        onClick={() => handleDarpanOrderChange(d, (d.displayOrder || index + 1) - 1)}
+                        title="Move Up in Order"
+                      >
+                        <ArrowUp size={13} />
+                      </button>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        style={{ padding: '2px 6px', fontSize: '0.75rem' }}
+                        onClick={() => handleDarpanOrderChange(d, (d.displayOrder || index + 1) + 1)}
+                        title="Move Down in Order"
+                      >
+                        <ArrowDown size={13} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ height: '150px', background: '#f1f5f9', borderRadius: '8px', overflow: 'hidden', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {d.coverImage ? (
                       <img
                         src={getMediaUrl(d.coverImage) || DEFAULT_DARPAN_COVER}
@@ -941,12 +986,18 @@ export default function ContentManager() {
                       <BookOpen size={48} color="var(--primary-navy)" />
                     )}
                   </div>
-                  <h3 style={{ fontSize: '1.1rem', color: 'var(--primary-navy)', marginBottom: '4px' }}>{d.titleEn || d.titleGu}</h3>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Month: {d.month} {d.year}</div>
+                  <h3 style={{ fontSize: '1.1rem', color: 'var(--primary-navy)', marginBottom: '4px', fontWeight: 'bold' }}>{d.titleEn || d.titleGu}</h3>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Month: {d.month} {d.year}</div>
+                  {d.pdfFile && (
+                    <div style={{ fontSize: '0.78rem', color: '#16A34A', fontWeight: 600 }}>
+                      ✓ PDF Attached
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
                   <button className="btn btn-outline btn-sm" onClick={() => handleEditDarpan(d)} style={{ flex: 1 }}>
-                    <Edit3 size={14} /> Edit
+                    <Edit3 size={14} /> Edit & Re-upload
                   </button>
                   <button className="btn btn-outline btn-sm" onClick={() => handleDeleteDarpan(d.id)} style={{ color: 'red' }}>
                     <Trash2 size={14} /> Delete
@@ -1100,7 +1151,7 @@ export default function ContentManager() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
                 <div className="form-group">
                   <label className="form-label">Month *</label>
                   <input type="text" className="form-control" placeholder="e.g. August / ઓગસ્ટ" value={darpanForm.month} onChange={(e) => setDarpanForm({ ...darpanForm, month: e.target.value })} required />
@@ -1109,6 +1160,24 @@ export default function ContentManager() {
                   <label className="form-label">Year *</label>
                   <input type="text" className="form-control" placeholder="e.g. 2026 / ૨૦૨૬" value={darpanForm.year} onChange={(e) => setDarpanForm({ ...darpanForm, year: e.target.value })} required />
                 </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ color: 'var(--primary-navy)', fontWeight: 'bold' }}>
+                    Display Order # *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="form-control"
+                    placeholder="1"
+                    value={darpanForm.displayOrder}
+                    onChange={(e) => setDarpanForm({ ...darpanForm, displayOrder: parseInt(e.target.value, 10) || 1 })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '14px', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.82rem', color: '#475569' }}>
+                💡 <strong>Tip:</strong> If you set <strong>Order #1</strong>, this issue will appear prominently in the top <strong>"Current Issue / વર્તમાન અંક"</strong> section. Issues with Order #2, #3... will appear in the <strong>"Past Issues / અગાઉના અંકો"</strong> archive in that sequence.
               </div>
 
               {/* COVER IMAGE FILE UPLOAD */}

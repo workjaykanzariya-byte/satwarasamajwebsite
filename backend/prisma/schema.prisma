@@ -403,15 +403,16 @@ model News {
 }
 
 model Publication {
-  id          Int      @id @default(autoincrement())
-  titleGu     String
-  titleEn     String
-  month       String
-  year        String
-  coverImage  String?  @db.LongText
-  pdfFile     String   @db.LongText
-  isPublished Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  titleGu      String
+  titleEn      String
+  month        String
+  year         String
+  coverImage   String?  @db.LongText
+  pdfFile      String   @db.LongText
+  displayOrder Int      @default(1)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
 }
 
 model GalleryAlbum {
